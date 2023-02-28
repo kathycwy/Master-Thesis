@@ -36,7 +36,7 @@ public class NlpService {
             while ((line = csvReader.readNext()) != null) {
                 if (line != null) {
 //                System.out.println(line[3]);
-                    rawText.add(line[3]);
+                    rawText.add(line[4]);
                 }
             }
 

@@ -6,14 +6,14 @@ import java.io.IOException;
 
 public class Save {
 
-    public static void save(String url, String date, String title, String content, int count) throws IOException {
+    public static void save(String url, String publishDate, String visitDate, String title, String content, int count) throws IOException {
 
         File f = new File("src/main/output/raw.csv");
         if (!f.exists()) {
             FileWriter file = new FileWriter(f);
             CSVWriter writer = new CSVWriter(file);
 
-            String[] header = { "Count", "Date", "Url", "Content" };
+            String[] header = { "Count", "PublishDate", "VisitDate", "Url", "Content" };
             writer.writeNext(header);
 
             writer.close();
@@ -22,7 +22,7 @@ public class Save {
 //        String[] tokens = Tokenizer.tokenize(content);
 
         CSVWriter writer = new CSVWriter(new FileWriter(f, true));
-        String[] record = new String[]{String.valueOf(count), date, url, String.valueOf(content)};
+        String[] record = new String[]{String.valueOf(count), publishDate, visitDate, url, String.valueOf(content)};
         writer.writeNext(record, true);
         writer.close();
 

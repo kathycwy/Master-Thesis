@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Crawler {
@@ -42,7 +43,9 @@ public class Crawler {
                     if (date.after(boundary)) {
                         String title = Scraper.scrape(site.titleSelector, doc);
                         String content = Scraper.scrape(site.contentSelectors, doc);
-                        Save.save(url, DateParser.finalFormatter.format(date), title, content, countSaved++);
+                        Calendar today = Calendar.getInstance();
+                        today.set(Calendar.HOUR_OF_DAY, 0);
+                        Save.save(url, DateParser.finalFormatter.format(date), DateParser.finalFormatter.format(today.getTime()), title, content, countSaved++);
                     }
 //                } else {
 //                    System.out.println("Trying the [" + countTotal++ + "] links: " + url);
