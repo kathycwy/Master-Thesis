@@ -4,7 +4,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
+import java.security.Timestamp;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,8 +17,8 @@ public class Crawler {
     public static int countSaved = 1;
 
     public static void crawl (int level, WebsiteDetailsClass site, String url, ArrayList<String> visited) {
-        if (level <= 50) {
-            Document doc = request(site, url, visited);
+        if (level <= site.level) {
+            Document doc = request(site, url, visited, level);
             if (doc != null) {
                 for (Element link : doc.select("a[href]")) {
                     String next_link = link.absUrl("href");
@@ -31,7 +33,7 @@ public class Crawler {
         }
     }
 
-    public static Document request(WebsiteDetailsClass site, String url, ArrayList<String> v) {
+    public static Document request(WebsiteDetailsClass site, String url, ArrayList<String> v, int level) {
         try {
             Connection con = Jsoup.connect(url);
             Document doc = con.get();
@@ -52,11 +54,13 @@ public class Crawler {
 //                    System.out.println(" - skip -");
                 }
 
-                System.out.println("Trying the [" + countTotal++ + "] links. Saved [" + (countSaved - 1) + "] links.");
+                System.out.println(new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date()) + "; Site " + site.dateParser + "; Level " + level + "; Trying the [" + countTotal++ + "] links; Saved [" + (countSaved - 1) + "] links.");
 
                 v.add(url);
                 return doc;
             }
+
+            System.out.println();
 
             return null;
         } catch (IOException | ParseException e) {

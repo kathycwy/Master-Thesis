@@ -20,23 +20,23 @@ public class Neo4jConnector implements AutoCloseable {
         driver.close();
     }
 
-    public void createFriendship(final String person1Name, final String person2Name) {
+    public void createPair(final String topic, final String link) {
         // To learn more about the Cypher syntax, see https://neo4j.com/docs/cypher-manual/current/
         // The Reference Card is also a good resource for keywords https://neo4j.com/docs/cypher-refcard/current/
         Query query = new Query(
                 """
-                CREATE (p1:Person { name: $person1_name })
-                CREATE (p2:Person { name: $person2_name })
-                CREATE (p1)-[:KNOWS]->(p2)
+                CREATE (p1:Topic { name: $topic1_name })
+                CREATE (p2:Link { name: $link1_name })
+                CREATE (p1)-[:containsIn]->(p2)
                 RETURN p1, p2
                 """,
-                Map.of("person1_name", person1Name, "person2_name", person2Name));
+                Map.of("topic1_name", topic, "link1_name", link));
 
         try (Session session = driver.session(SessionConfig.forDatabase("neo4j"))) {
             // Write transactions allow the driver to handle retries and transient errors
             var record = session.executeWrite(tx -> tx.run(query).single());
             System.out.printf(
-                    "Created friendship between: %s, %s%n",
+                    "Created pair for : %s, %s%n",
                     record.get("p1").get("name").asString(),
                     record.get("p2").get("name").asString());
             // You should capture any errors along with the query and data for traceability
@@ -72,8 +72,8 @@ public class Neo4jConnector implements AutoCloseable {
         String password = "password";
 
         try (Neo4jConnector app = new Neo4jConnector(uri, user, password, Config.defaultConfig())) {
-            app.createFriendship("Alice", "David");
-            app.findPerson("Alice");
+            app.createPair("Computer", "https://blog.net/123.html");
+//            app.findPerson("Alice");
         }
     }
 }

@@ -12,4 +12,6 @@ public class WebsiteDetailsClass {
 
     int dateParser;
 
+    int level;
+
 }
