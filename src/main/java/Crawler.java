@@ -4,7 +4,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
-import java.security.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ public class Crawler {
                         String content = Scraper.scrape(site.contentSelectors, doc);
                         Calendar today = Calendar.getInstance();
                         today.set(Calendar.HOUR_OF_DAY, 0);
-                        Save.save(url, DateParser.finalFormatter.format(date), DateParser.finalFormatter.format(today.getTime()), title, content, countSaved++);
+                        Save.save(url, DateParser.finalFormatter.format(date), DateParser.finalFormatter.format(today.getTime()), content, countSaved++);
                     }
 //                } else {
 //                    System.out.println("Trying the [" + countTotal++ + "] links: " + url);

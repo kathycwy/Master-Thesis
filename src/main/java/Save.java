@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class Save {
 
-    public static void save(String url, String publishDate, String visitDate, String title, String content, int count) throws IOException {
+    public static void save(String url, String publishDate, String visitDate, String content, int count) throws IOException {
 
         File f = new File("src/main/output/raw.csv");
         if (!f.exists()) {
