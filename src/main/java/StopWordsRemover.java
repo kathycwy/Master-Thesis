@@ -20,7 +20,7 @@ public class StopWordsRemover {
 
         // And the stop words in resources (containing the most known English words)
         // from https://github.com/powerlanguage/word-lists/blob/master/1000-most-common-words.txt
-        final String stopWordsResourcePath = "common-words-list.txt";
+        final String stopWordsResourcePath = "stopwords.txt";
 
         final Properties props;
         props = new Properties();
@@ -49,7 +49,8 @@ public class StopWordsRemover {
                         "POS," + // possessive ending: 's
                         "SYM," + // symbol
                         "WDT,WP,WP$," + // wh-determiner (who), wh-pronoun (who, what, whom) and possessive wh-pronoun (whose)
-                        "WRB" // wh-adverb
+                        "WRB," + // wh-adverb
+                        "CD," //cardinal number
         );
 
         // provide the file with stop words list

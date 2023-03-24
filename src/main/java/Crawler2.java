@@ -42,7 +42,11 @@ public class Crawler2 {
             Date date = formatter.parse(uploadedAt);
             Date boundary = DateParser.finalFormatter.parse("2013-01-01");
 
-            if (date.after(boundary)) {
+            JSONObject transcriptionStatus = p.getJSONObject("transcription");
+            String status = transcriptionStatus.getString("status");
+
+            if (date.after(boundary) && status.equals("Done")) {
+
                 int id = p.getInt("id");
                 String link = "https://app.podscribe.ai/episode/" + id;
 
