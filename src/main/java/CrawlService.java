@@ -7,16 +7,20 @@ public class CrawlService {
 
     public static void main(String[] args) throws Exception {
 
+        // delete existing CSV file if any
         File f = new File("src/main/output/raw.csv");
         if (f.delete()) {
             System.out.println("Old CSV file deleted");
         }
 
+        // crawl for the first 5 blog websites
         for (WebsiteDetailsClass site : websiteDetails) {
-            Crawler.crawl(1, site, site.rootUrl, new ArrayList<String>());
+            Crawler.crawlStaticPage(1, site, site.rootUrl, new ArrayList<String>());
         }
 
-//        Crawler2.getHTML("https://backend.podscribe.ai/api/series/extra?id=2017&numEpisodes=100000");
+
+        // crawl for the podcast website
+        Crawler.crawlPodscribeTranscript(WebsiteDetails.site6);
 
     }
 

@@ -58,26 +58,11 @@ public class WebsiteDetails {
             5,
             20);
 
-    WebsiteDetailsClass site6 = setWebsiteDetails(
-            "https://app.podscribe.ai/series/2017",
-            "/^((http[s]?):\\/)?\\/?((\\/app\\.podscribe\\.ai)*\\/episode\\/)([\\d]+)$/",
-            new String[]{""},
-            new String[]{""},
-            new String[]{"div[data-paragraph-text]"},
-            6,
-            20);
+    static String site6 = "https://backend.podscribe.ai/api/series/extra?id=2017&numEpisodes=100000";
 
-    WebsiteDetailsClass site7 = setWebsiteDetails(
-            "https://the-stack-overflow-podcast.simplecast.com/episodes/",
-            "^((http[s]?):\\/)?\\/?((\\/the-stack-overflow-podcast\\.simplecast\\.com)*\\/)(episodes\\/)(.*)(\\/transcript)$",
-            new String[]{""},
-            new String[]{""},
-            new String[]{""},
-            7,
-            20);
 
     public WebsiteDetailsClass[] getAllWebsiteDetails() {
-        return new WebsiteDetailsClass[]{site1};
+        return new WebsiteDetailsClass[]{site1, site2, site3, site4, site5};
     }
 
 }

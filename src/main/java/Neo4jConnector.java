@@ -46,24 +46,24 @@ public class Neo4jConnector implements AutoCloseable {
         }
     }
 
-    public void findPerson(final String personName) {
-        Query query = new Query(
-                """
-                MATCH (p:Person)
-                WHERE p.name = $person_name
-                RETURN p.name AS name
-                """,
-                Map.of("person_name", personName));
-
-        try (Session session = driver.session(SessionConfig.forDatabase("neo4j"))) {
-            var record = session.executeRead(tx -> tx.run(query).single());
-            System.out.printf("Found person: %s%n", record.get("name").asString());
-            // You should capture any errors along with the query and data for traceability
-        } catch (Neo4jException ex) {
-            LOGGER.log(Level.SEVERE, query + " raised an exception", ex);
-            throw ex;
-        }
-    }
+//    public void findPerson(final String personName) {
+//        Query query = new Query(
+//                """
+//                MATCH (p:Person)
+//                WHERE p.name = $person_name
+//                RETURN p.name AS name
+//                """,
+//                Map.of("person_name", personName));
+//
+//        try (Session session = driver.session(SessionConfig.forDatabase("neo4j"))) {
+//            var record = session.executeRead(tx -> tx.run(query).single());
+//            System.out.printf("Found person: %s%n", record.get("name").asString());
+//            // You should capture any errors along with the query and data for traceability
+//        } catch (Neo4jException ex) {
+//            LOGGER.log(Level.SEVERE, query + " raised an exception", ex);
+//            throw ex;
+//        }
+//    }
 
     public static void main(String... args) {
         // Aura queries use an encrypted connection using the "neo4j+s" protocol

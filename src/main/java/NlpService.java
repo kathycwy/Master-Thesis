@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class NlpService {
 
-    private static String filepath = "src/main/output/raw-200.csv";
+    private static String filepath = "src/main/output/raw-test.csv";
 
     public static void main(String[] args) {
 
@@ -37,7 +37,7 @@ public class NlpService {
 //            }
 
 
-            File f = new File("src/main/output/raw-200-clean.csv");
+            File f = new File("src/main/output/raw-test-clean.csv");
             FileWriter file = new FileWriter(f);
             CSVWriter writer = new CSVWriter(file);
             String[] header = { "Index", "Tokens" };
