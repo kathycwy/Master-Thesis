@@ -13,13 +13,7 @@ public class StopWordsRemover {
 
     public static Set<String> removeStopWords(String str) {
 
-        // I want to get the list of lemmas created from the text, excluding words from the provided list and all the
-        // common or simple words (like propositions, conjunctions, etc.), since I want to extract only the words
-        // I could be interested to learn
-        String[] expectedWords = {"dear", "look", "have", "give", "riding", "hood", "velvet", "suit", "wear", "call"};
-
-        // And the stop words in resources (containing the most known English words)
-        // from https://github.com/powerlanguage/word-lists/blob/master/1000-most-common-words.txt
+        // stopwords list from Ranks NL
         final String stopWordsResourcePath = "stopwords.txt";
 
         final Properties props;

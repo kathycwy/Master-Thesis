@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class NlpService {
 
-    private static String filepath = "src/main/output/raw-test.csv";
+    private static String filepath = "src/main/output/raw-complete.csv";
 
     public static void main(String[] args) {
 
@@ -37,7 +37,7 @@ public class NlpService {
 //            }
 
 
-            File f = new File("src/main/output/raw-test-clean.csv");
+            File f = new File("src/main/output/raw-complete-clean.csv");
             FileWriter file = new FileWriter(f);
             CSVWriter writer = new CSVWriter(file);
             String[] header = { "Index", "Tokens" };
@@ -51,16 +51,17 @@ public class NlpService {
 //            System.out.println(Arrays.toString(tokens));
                 tokens = StopWordsRemover.removeStopWords(text);
 
-                String[] record = new String[]{String.valueOf(index++), String.valueOf(tokens)};
+                String[] record = new String[]{String.valueOf(index), String.valueOf(tokens)};
 
                 writer.writeNext(record, true);
 
+                System.out.println(index++ + " " + Arrays.toString(tokens.toArray()));
 
                 }
 
                 writer.close();
 
-                System.out.println(Arrays.toString(tokens.toArray()));
+
 
             } catch (IOException ioException) {
             ioException.printStackTrace();
