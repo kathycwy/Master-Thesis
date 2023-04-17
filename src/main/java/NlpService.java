@@ -15,27 +15,7 @@ public class NlpService {
 
         try {
 
-//            BufferedReader br = new BufferedReader(new FileReader(filepath));
-//
-//            CSVParser parser = new CSVParserBuilder()
-//                    .withSeparator(',')
-//                    .withIgnoreQuotations(false)
-//                    .build();
-//
-//            CSVReader csvReader = new CSVReaderBuilder(br)
-//                    .withSkipLines(1)
-//                    .withCSVParser(parser)
-//                    .build();
-//
-//            ArrayList<String> rawText = new ArrayList<>();
-//            String[] line;
-//            while ((line = csvReader.readNext()) != null) {
-//                if (line != null) {
-////                System.out.println(line[3]);
-//                    rawText.add(line[4]);
-//                }
-//            }
-
+            int count = rawText.size();
 
             File f = new File("src/main/output/raw-complete-clean.csv");
             FileWriter file = new FileWriter(f);
@@ -43,22 +23,25 @@ public class NlpService {
             String[] header = { "Index", "Tokens" };
             writer.writeNext(header);
 
-//        String[] tokens;
+            System.out.println("Start text cleaning and tokenizing.");
+
             Set<String> tokens = null;
             int index = 1;
             for (String text : rawText) {
-//            tokens = Tokenizer.tokenize(text);
-//            System.out.println(Arrays.toString(tokens));
-                tokens = StopWordsRemover.removeStopWords(text);
+
+                tokens = NlpTextProcessor.removePosAndStopWords(text);
+
+                tokens = NlpTextProcessor.removeUrl(tokens);
 
                 String[] record = new String[]{String.valueOf(index), String.valueOf(tokens)};
 
                 writer.writeNext(record, true);
 
-                System.out.println(index++ + " " + Arrays.toString(tokens.toArray()));
+                System.out.println("[" + index++ + "/" + count + "] " + Arrays.toString(tokens.toArray()));
 
                 }
 
+                System.out.println("Complete text cleaning and tokenizing.");
                 writer.close();
 
 
@@ -91,7 +74,6 @@ public class NlpService {
             String[] line;
             while ((line = csvReader.readNext()) != null) {
                 if (line != null) {
-//                System.out.println(line[3]);
                     rawText.add(line[4]);
                 }
             }
