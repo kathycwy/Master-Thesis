@@ -9,13 +9,13 @@ public class NlpService {
 
     private static String filepath = "src/main/output/raw-complete.csv";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         ArrayList<String> rawText = getRawText(filepath);
 
-        try {
+        System.out.println("Text cleaning and tokenizing STARTED.");
 
-            int count = rawText.size();
+        int count = rawText.size();
 
             File f = new File("src/main/output/raw-complete-clean.csv");
             FileWriter file = new FileWriter(f);
@@ -23,33 +23,26 @@ public class NlpService {
             String[] header = { "Index", "Tokens" };
             writer.writeNext(header);
 
-            System.out.println("Start text cleaning and tokenizing.");
+        Set<String> tokens = null;
+        int index = 1;
+        for (String text : rawText) {
 
-            Set<String> tokens = null;
-            int index = 1;
-            for (String text : rawText) {
+            tokens = NlpTextProcessor.removePosAndStopWords(text);
 
-                tokens = NlpTextProcessor.removePosAndStopWords(text);
+            tokens = NlpTextProcessor.removeUrl(tokens);
 
-                tokens = NlpTextProcessor.removeUrl(tokens);
+            String[] record = new String[]{String.valueOf(index), String.valueOf(tokens)};
 
-                String[] record = new String[]{String.valueOf(index), String.valueOf(tokens)};
+            writer.writeNext(record, true);
 
-                writer.writeNext(record, true);
+            System.out.println("[" + index++ + "/" + count + "] " + Arrays.toString(tokens.toArray()));
 
-                System.out.println("[" + index++ + "/" + count + "] " + Arrays.toString(tokens.toArray()));
+            }
 
-                }
-
-                System.out.println("Complete text cleaning and tokenizing.");
-                writer.close();
+        writer.close();
 
 
-
-            } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
-
+        System.out.println("Text cleaning and tokenizing COMPLETED.");
 
     }
 

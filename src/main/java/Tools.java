@@ -1,7 +1,6 @@
 import com.opencsv.*;
 
 import java.io.*;
-import java.util.ArrayList;
 
 public class Tools {
 
@@ -9,7 +8,7 @@ public class Tools {
 
 //        reorderRaw();
 //        extract200();
-        TopicModeller.prepareTxt();
+        TopicModellingService.prepareTxt();
 //        TopicModeller.runMallet();
 
 //        long lines = 0;

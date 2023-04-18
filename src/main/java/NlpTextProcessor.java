@@ -31,13 +31,13 @@ public class NlpTextProcessor {
 //        }
 //        return (t.isEmpty() ? text : t);
 
-        try {
+//        try {
 
             String urlPattern = "((\\S+)((:\\/\\/)|(\\.)|(\\/))((\\S)+))";
             text.removeIf(t -> t.matches(urlPattern));
-        } catch (Exception e) {
-
-        }
+//        } catch (Exception e) {
+//
+//        }
         return text;
 
     }
