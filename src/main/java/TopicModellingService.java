@@ -4,6 +4,10 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 public class TopicModellingService {
 
@@ -29,7 +33,7 @@ public class TopicModellingService {
         String[] line;
         while ((line = csvReader.readNext()) != null) {
 
-            File file = new File("Mallet-202108/data/txt" + line[0] + ".txt");
+            File file = new File("Mallet-202108/data/" + line[0] + ".txt");
             FileWriter myWriter = new FileWriter(file);
             myWriter.write(line[1]);
             myWriter.close();
@@ -38,7 +42,66 @@ public class TopicModellingService {
 
     }
 
-    static public void runMallet() throws IOException, InterruptedException {
+    static public ArrayList<ArrayList<String>> getTopicState() throws IOException {
+
+        ArrayList<ArrayList<String>> result = new ArrayList<>();
+        ArrayList<String> lines = new ArrayList<>();
+
+        GZIPInputStream gzip = new GZIPInputStream(new FileInputStream("Mallet-202108/output/topic-state.gz"));
+        BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
+
+        // skip the first 3 lines
+        br.readLine();
+        br.readLine();
+        br.readLine();
+
+        for (String line; (line = br.readLine()) != null; ) {
+            lines.add(line);
+        }
+
+        for (String str : lines) {
+            ArrayList<String> data = new ArrayList<>(Arrays.asList(str.split(" ")));
+            // get docId from the filepath
+            data.set(1, data.get(1).substring(19, data.get(1).length() - 4));
+            // add W before word id
+            data.set(3, "W" + data.get(3));
+            // add T before topic id
+            data.set(5, "T" + data.get(5));
+            result.add(data);
+        }
+
+        return result;
+    }
+
+    static public List<String[]> getDocument() {
+
+        try {
+
+            BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-complete.csv"));
+
+            CSVParser parser = new CSVParserBuilder()
+                    .withSeparator(',')
+                    .withIgnoreQuotations(false)
+                    .build();
+
+            CSVReader csvReader = new CSVReaderBuilder(br)
+                    .withSkipLines(1)
+                    .withCSVParser(parser)
+                    .build();
+
+            List<String[]> result = csvReader.readAll();
+            return result;
+
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
+        static public void runMallet() throws IOException, InterruptedException {
 
 //        String[] command = new String[2];
 //        // transform individual txt files into a single MALLET format file

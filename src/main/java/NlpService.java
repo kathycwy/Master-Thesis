@@ -3,6 +3,7 @@ import com.opencsv.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 
 public class NlpService {
@@ -20,7 +21,7 @@ public class NlpService {
             File f = new File("src/main/output/raw-complete-clean.csv");
             FileWriter file = new FileWriter(f);
             CSVWriter writer = new CSVWriter(file);
-            String[] header = { "Index", "Tokens" };
+            String[] header = { "DocId", "Tokens" };
             writer.writeNext(header);
 
         Set<String> tokens = null;
@@ -31,7 +32,7 @@ public class NlpService {
 
             tokens = NlpTextProcessor.removeUrl(tokens);
 
-            String[] record = new String[]{String.valueOf(index), String.valueOf(tokens)};
+            String[] record = new String[]{"D"+index, String.valueOf(tokens)};
 
             writer.writeNext(record, true);
 
@@ -77,6 +78,47 @@ public class NlpService {
         }
 
         return rawText;
+
+    }
+
+    static ArrayList<ArrayList<String>> getTokensList(String path) {
+
+        ArrayList<ArrayList<String>> result = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<>();
+
+        try {
+
+            BufferedReader br = new BufferedReader(new FileReader(path));
+
+            CSVParser parser = new CSVParserBuilder()
+                    .withSeparator(',')
+                    .withIgnoreQuotations(false)
+                    .build();
+
+            CSVReader csvReader = new CSVReaderBuilder(br)
+                    .withSkipLines(1)
+                    .withCSVParser(parser)
+                    .build();
+
+            String[] line;
+            while ((line = csvReader.readNext()) != null) {
+                if (line != null) {
+                    list.add(line[1]);
+                }
+            }
+
+
+        } catch (IOException e) {
+            System.out.println("Error - Input source not found.");
+        }
+
+        for (String token : list) {
+            token = token.substring(1, token.length()-1);
+            ArrayList<String> tokens = new ArrayList<>(Arrays.asList(token.split(", ")));
+            result.add(tokens);
+        }
+
+        return result;
 
     }
 

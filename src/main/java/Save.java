@@ -13,7 +13,7 @@ public class Save {
             FileWriter file = new FileWriter(f);
             CSVWriter writer = new CSVWriter(file);
 
-            String[] header = { "Count", "PublishDate", "VisitDate", "Url", "Content" };
+            String[] header = { "DocId", "PublishDate", "VisitDate", "Url", "Content" };
             writer.writeNext(header);
 
             writer.close();
@@ -22,7 +22,7 @@ public class Save {
 //        String[] tokens = Tokenizer.tokenize(content);
 
         CSVWriter writer = new CSVWriter(new FileWriter(f, true));
-        String[] record = new String[]{String.valueOf(count), publishDate, visitDate, url, String.valueOf(content)};
+        String[] record = new String[]{"D"+count, publishDate, visitDate, url, String.valueOf(content)};
         writer.writeNext(record, true);
         writer.close();
 

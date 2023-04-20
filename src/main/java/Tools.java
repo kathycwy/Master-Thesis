@@ -1,16 +1,21 @@
 import com.opencsv.*;
 
 import java.io.*;
+import java.util.List;
 
 public class Tools {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
 //        reorderRaw();
+//        reorderClean();
 //        extract200();
-        TopicModellingService.prepareTxt();
+//        TopicModellingService.prepareTxt();
+//        TopicModellingService.getTopicState();
+        TopicModellingService.getDocument();
+//        NlpService.getTokensList("src/main/output/testfiles/raw-200-clean.csv");
 //        TopicModeller.runMallet();
-
+//        deleteRowinCsv();
 //        long lines = 0;
 //
 //        try (InputStream is = new BufferedInputStream(new FileInputStream("src/main/output/raw.csv"))) {
@@ -60,13 +65,50 @@ public class Tools {
         FileWriter file = new FileWriter(f);
         CSVWriter writer = new CSVWriter(file);
 
-        String[] header = { "Index", "PublishDate", "VisitDate", "Url", "Content" };
+        String[] header = { "DocId", "PublishDate", "VisitDate", "Url", "Content" };
         writer.writeNext(header);
 
         String[] line;
         while ((line = csvReader.readNext()) != null) {
 
-            String[] record = new String[]{String.valueOf(index++), line[1], line[2], line[3], line[4]};
+            String[] record = new String[]{"D"+index++, line[1], line[2], line[3], line[4]};
+
+            writer.writeNext(record, true);
+
+        }
+
+        writer.close();
+
+    }
+
+    static void reorderClean() throws IOException {
+
+        int index = 1;
+
+        BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-complete-clean-copy.csv"));
+        File f = new File("src/main/output/raw-complete-clean.csv");
+
+        CSVParser parser = new CSVParserBuilder()
+                .withSeparator(',')
+                .withIgnoreQuotations(false)
+                .build();
+
+        CSVReader csvReader = new CSVReaderBuilder(br)
+                .withSkipLines(1)
+                .withCSVParser(parser)
+                .build();
+
+
+        FileWriter file = new FileWriter(f);
+        CSVWriter writer = new CSVWriter(file);
+
+        String[] header = { "DocId", "Tokens" };
+        writer.writeNext(header);
+
+        String[] line;
+        while ((line = csvReader.readNext()) != null) {
+
+            String[] record = new String[]{"D"+line[0], line[1]};
 
             writer.writeNext(record, true);
 
@@ -98,7 +140,7 @@ public class Tools {
         FileWriter file = new FileWriter(f);
         CSVWriter writer = new CSVWriter(file);
 
-        String[] header = { "Index", "PublishDate", "VisitDate", "Url", "Content" };
+        String[] header = { "DocId", "PublishDate", "VisitDate", "Url", "Content" };
         writer.writeNext(header);
 
         String[] line;
@@ -112,6 +154,18 @@ public class Tools {
             }
         }
 
+        writer.close();
+
+    }
+
+    static public void deleteRowinCsv() throws IOException {
+
+        CSVReader reader2 = new CSVReader(new FileReader("src/main/output/raw-complete.csv"));
+        List<String[]> allElements = reader2.readAll();
+        allElements.remove(2646);
+        FileWriter sw = new FileWriter("src/main/output/raw-complete-new.csv");
+        CSVWriter writer = new CSVWriter(sw);
+        writer.writeAll(allElements);
         writer.close();
 
     }
