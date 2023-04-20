@@ -24,7 +24,7 @@ public class Neo4jConnector implements AutoCloseable {
         driver.close();
     }
 
-    public static void prepareDbData() throws IOException {
+    public static void prepareDbDataSplit() throws IOException {
 
         ArrayList<ArrayList<String>> topicState = TopicModellingService.getTopicState();
 //        List<String[]> documents = TopicModellingService.getDocument();
@@ -32,7 +32,9 @@ public class Neo4jConnector implements AutoCloseable {
         int i = 0;
         int name = 0;
         int loop = 0;
+
         while (i < topicState.size()) {
+
             File f = new File("src/main/output/word-topic-doc-db-" + name + ".csv");
 
             FileWriter file = new FileWriter(f);
@@ -41,22 +43,48 @@ public class Neo4jConnector implements AutoCloseable {
             String[] header = {"wordId", "word", "docId", "topicId"};
             writer.writeNext(header);
 
-            ArrayList<String> line = topicState.get(i);
+            while (loop < 50000) {
+
+                ArrayList<String> line = topicState.get(i++);
+
+                String[] record = new String[]{line.get(3), line.get(4), line.get(1), line.get(5)};
+
+                writer.writeNext(record, true);
+
+                loop++;
+            }
+            writer.close();
+
+            loop = 0;
+            name++;
+            System.out.println("created word-topic-doc-db-" + name + ".csv");
+        }
+
+
+    }
+
+    public static void prepareDbDataAll() throws IOException {
+
+        ArrayList<ArrayList<String>> topicState = TopicModellingService.getTopicState();
+//        List<String[]> documents = TopicModellingService.getDocument();
+
+        File f = new File("src/main/output/word-topic-doc-db.csv");
+
+        FileWriter file = new FileWriter(f);
+        CSVWriter writer = new CSVWriter(file);
+
+        String[] header = {"wordId", "word", "docId", "topicId"};
+        writer.writeNext(header);
+
+        for (ArrayList<String> line : topicState) {
 
             String[] record = new String[]{line.get(3), line.get(4), line.get(1), line.get(5)};
 
             writer.writeNext(record, true);
 
-            i++;
-            loop++;
-            if (loop == 50000) {
-                loop = 0;
-                name++;
-                System.out.println("created word-topic-doc-db-" + name + ".csv");
-            }
-
-            writer.close();
         }
+        writer.close();
+
 
     }
 

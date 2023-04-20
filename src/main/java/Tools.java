@@ -12,7 +12,8 @@ public class Tools {
 //        extract200();
 //        TopicModellingService.prepareTxt();
 //        TopicModellingService.getTopicState()
-        Neo4jConnector.prepareDbData();
+        Neo4jConnector.prepareDbDataSplit();
+//        Neo4jConnector.prepareDbDataAll();
 //        TopicModellingService.getDocument();
 //        NlpService.getTokensList("src/main/output/testfiles/raw-200-clean.csv");
 //        TopicModeller.runMallet();
