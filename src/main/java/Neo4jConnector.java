@@ -29,37 +29,51 @@ public class Neo4jConnector implements AutoCloseable {
         ArrayList<ArrayList<String>> topicState = TopicModellingService.getTopicState();
 //        List<String[]> documents = TopicModellingService.getDocument();
 
-        File f = new File("src/main/output/word-topic-doc-db.csv");
+        int i = 0;
+        int name = 0;
+        int loop = 0;
+        while (i < topicState.size()) {
+            File f = new File("src/main/output/word-topic-doc-db-" + name + ".csv");
 
-        FileWriter file = new FileWriter(f);
-        CSVWriter writer = new CSVWriter(file);
+            FileWriter file = new FileWriter(f);
+            CSVWriter writer = new CSVWriter(file);
 
-        String[] header = { "wordId", "word", "docId", "topicId" };
-        writer.writeNext(header);
+            String[] header = {"wordId", "word", "docId", "topicId"};
+            writer.writeNext(header);
 
-        for (ArrayList<String> line : topicState) {
+            ArrayList<String> line = topicState.get(i);
 
             String[] record = new String[]{line.get(3), line.get(4), line.get(1), line.get(5)};
 
             writer.writeNext(record, true);
+
+            i++;
+            loop++;
+            if (loop == 50000) {
+                loop = 0;
+                name++;
+                System.out.println("created word-topic-doc-db-" + name + ".csv");
+            }
+
+            writer.close();
         }
-
-        writer.close();
-
 
     }
 
-    public void createTopicAndWord() throws IOException {
+
+
+
+    public void createTopicAndWord() throws Exception {
 
         Query query = new Query(
                 """
-                LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/word-topic-doc-db.csv' AS row
-                MERGE (t:Topic { topicId: row.topicId })
-                MERGE (w:Word { wordId: row.wordId, text: row.word })
-                MERGE (w)-[:belongs_to]->(t)
-                WITH w
-                MATCH (d:Document WHERE d.docId = row.docId)
-                MERGE (w)-[:found_in]->(d);
+                   LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/word-topic-doc-db.csv' AS line
+                   MERGE (t:Topic { topicId: line.topicId })
+                   MERGE (w:Word { wordId: line.wordId, text: line.word })
+                   MERGE (w)-[:belongs_to]->(t)
+                   WITH w, line
+                   MATCH (d:Document WHERE d.docId = line.docId)
+                   MERGE (w)-[:found_in]->(d);
                 """);
         runCypher(query);
 
@@ -140,6 +154,8 @@ public class Neo4jConnector implements AutoCloseable {
 //                }
 //            }
 //            System.out.println("Total " + id + " Topic nodes are created");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
