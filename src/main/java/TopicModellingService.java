@@ -47,7 +47,7 @@ public class TopicModellingService {
         ArrayList<ArrayList<String>> result = new ArrayList<>();
         ArrayList<String> lines = new ArrayList<>();
 
-        GZIPInputStream gzip = new GZIPInputStream(new FileInputStream("Mallet-202108/output/topic-state-copy.gz"));
+        GZIPInputStream gzip = new GZIPInputStream(new FileInputStream("Mallet-202108/output/topic-state.gz"));
         BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
 
         // skip the first 3 lines
@@ -111,7 +111,7 @@ public class TopicModellingService {
 
         Runtime rt = Runtime.getRuntime();
         // transform individual txt files into a single MALLET format file
-        Process pr = rt.exec("Mallet-202108/bin/mallet import-dir --input Mallet-202108/data --output Mallet-202108/output/input.mallet --keep-sequence --remove-stopwords");
+        Process pr = rt.exec("Mallet-202108/bin/mallet import-dir --input Mallet-202108/data --output Mallet-202108/output/input.mallet --keep-sequence");
 
         // trains MALLET to find 50 topics
         pr = rt.exec("Mallet-202108/bin/mallet train-topics  --input Mallet-202108/output/input.mallet --num-topics 100 --optimize-interval 10 --output-state Mallet-202108/output/topic-state.gz --output-topic-keys Mallet-202108/output/keys.txt --output-doc-topics Mallet-202108/output/composition.txt");

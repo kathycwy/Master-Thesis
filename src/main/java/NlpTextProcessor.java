@@ -53,8 +53,8 @@ public class NlpTextProcessor {
         props.setProperty("customAnnotatorClass.stopwords", "io.github.pepperkit.corenlp.stopwords.StopWordsAnnotator");
         props.setProperty("ssplit.isOneSentence", "true");
 
-//        // to filter out all the punctuation and simple words like be, so, etc.
-//        props.setProperty("stopwords.withLemmasShorterThan", "3");
+        // to filter out all the punctuation and simple words like be, so, etc.
+        props.setProperty("stopwords.withLemmasShorterThan", "2");
 
         // to filter out all the common and simple words
         // Description of the available POS categories can be found here:

@@ -7,11 +7,12 @@ public class Tools {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        reorderRaw();
+//        reorderRaw();
 //        reorderClean();
 //        extract200();
 //        TopicModellingService.prepareTxt();
-//        TopicModellingService.getTopicState();
+//        TopicModellingService.getTopicState()
+        Neo4jConnector.prepareDbData();
 //        TopicModellingService.getDocument();
 //        NlpService.getTokensList("src/main/output/testfiles/raw-200-clean.csv");
 //        TopicModeller.runMallet();

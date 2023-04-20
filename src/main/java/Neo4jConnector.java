@@ -1,13 +1,8 @@
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
+import com.opencsv.*;
 import org.neo4j.driver.*;
 import org.neo4j.driver.exceptions.Neo4jException;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,10 +24,28 @@ public class Neo4jConnector implements AutoCloseable {
         driver.close();
     }
 
-    public void prepareDbData() throws IOException {
+    public static void prepareDbData() throws IOException {
 
         ArrayList<ArrayList<String>> topicState = TopicModellingService.getTopicState();
-        List<String[]> documents = TopicModellingService.getDocument();
+//        List<String[]> documents = TopicModellingService.getDocument();
+
+        File f = new File("src/main/output/word-topic-doc-db.csv");
+
+        FileWriter file = new FileWriter(f);
+        CSVWriter writer = new CSVWriter(file);
+
+        String[] header = { "wordId", "word", "docId", "topicId" };
+        writer.writeNext(header);
+
+        for (ArrayList<String> line : topicState) {
+
+            String[] record = new String[]{line.get(3), line.get(4), line.get(1), line.get(5)};
+
+            writer.writeNext(record, true);
+        }
+
+        writer.close();
+
 
     }
 
