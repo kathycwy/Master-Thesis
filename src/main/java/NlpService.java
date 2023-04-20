@@ -18,7 +18,7 @@ public class NlpService {
 
         int count = rawText.size();
 
-            File f = new File("src/main/output/raw-complete-clean.csv");
+            File f = new File("src/main/output/raw-complete-clean-new.csv");
             FileWriter file = new FileWriter(f);
             CSVWriter writer = new CSVWriter(file);
             String[] header = { "DocId", "Tokens" };

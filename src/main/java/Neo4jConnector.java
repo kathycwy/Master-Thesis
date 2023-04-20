@@ -36,7 +36,7 @@ public class Neo4jConnector implements AutoCloseable {
 
     }
 
-    public void createTopic() throws IOException {
+    public void createTopicAndWord() throws IOException {
 
         ArrayList<ArrayList<String>> topicState = TopicModellingService.getTopicState();
 
@@ -46,17 +46,24 @@ public class Neo4jConnector implements AutoCloseable {
                     """
                     MERGE (t:Topic { topicId: $topicId })
                     MERGE (w:Word { wordId: $wordId, text: $text })
-                    MERGE (w)-[:belongs_to]->(t);
+                    MERGE (w)-[:belongs_to]->(t)
+                    WITH w
+                    MATCH (d:Document WHERE d.docId = $docId)
+                    MERGE (w)-[:found_in]->(d);
                     """,
-                    Map.of("topicId", line.get(5), "wordId", line.get(3), "text", line.get(4)));
+                    Map.of("topicId", line.get(5), "wordId", line.get(3), "text", line.get(4), "docId", line.get(1)));
 
             runCypher(query);
 
+            System.out.println("Creating nodes for Topic " + line.get(5) + " and Word " + line.get(3) + "...");
+
         }
+
+        System.out.println("Creating Topic and Word nodes completed");
 
     }
 
-    public void createDocument() {
+    public void createWebsiteAndDocument() {
 
         try {
 
@@ -72,23 +79,23 @@ public class Neo4jConnector implements AutoCloseable {
                     .withCSVParser(parser)
                     .build();
 
-            int count = 0;
             String[] line;
             while ((line = csvReader.readNext()) != null) {
                 if (line != null) {
                     Query query = new Query(
                         """
-                        MERGE (d:Document { docId: $docId, publishDate: date($publishDate), visitDate: date($visitDate), url: $url });
+                        MERGE (s:Website { siteId: $siteId, siteName: $siteName, siteUrl: $siteUrl })
+                        CREATE (d:Document { docId: $docId, publishDate: date($publishDate), visitDate: date($visitDate), url: $url })
+                        CREATE (s)-[:contains]->(d);
                         """,
-                        Map.of("docId", line[0], "publishDate", line[1], "visitDate", line[2], "url", line[3] )
+                        Map.of("siteId", line[3], "siteName", line[4], "siteUrl", line[5], "docId", line[0], "publishDate", line[1], "visitDate", line[2], "url", line[6] )
                     );
                     runCypher(query);
-                    count++;
-                    System.out.println("Creating nodes for Document " + line[0] + "...");
+                    System.out.println("Creating nodes for Website " + line[3] + " and Document " + line[0] + "...");
                 }
             }
 
-            System.out.println("Total " + count + " Document nodes are created");
+            System.out.println("Creating Website and Document nodes completed");
 
         } catch (IOException e) {
             System.out.println("Error - Input source not found.");
@@ -119,8 +126,8 @@ public class Neo4jConnector implements AutoCloseable {
 
         try (Neo4jConnector app = new Neo4jConnector(uri, user, password, Config.defaultConfig())) {
 
-//            app.createDocument();
-            app.createTopic();
+//            app.createWebsiteAndDocument();
+            app.createTopicAndWord();
 //            int id = 1;
 //            for (ArrayList<String> tokenLine : tokensList) {
 //                for (String token : tokenLine) {

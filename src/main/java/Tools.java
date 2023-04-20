@@ -7,12 +7,12 @@ public class Tools {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-//        reorderRaw();
+        reorderRaw();
 //        reorderClean();
 //        extract200();
 //        TopicModellingService.prepareTxt();
 //        TopicModellingService.getTopicState();
-        TopicModellingService.getDocument();
+//        TopicModellingService.getDocument();
 //        NlpService.getTokensList("src/main/output/testfiles/raw-200-clean.csv");
 //        TopicModeller.runMallet();
 //        deleteRowinCsv();
@@ -46,8 +46,6 @@ public class Tools {
 
     static void reorderRaw() throws IOException {
 
-        int index = 1;
-
         BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-complete-copy.csv"));
         File f = new File("src/main/output/raw-complete.csv");
 
@@ -65,13 +63,22 @@ public class Tools {
         FileWriter file = new FileWriter(f);
         CSVWriter writer = new CSVWriter(file);
 
-        String[] header = { "DocId", "PublishDate", "VisitDate", "Url", "Content" };
+        String[] header = { "DocId", "PublishDate", "VisitDate", "SiteId", "SiteName", "SiteUrl", "Url", "Content" };
         writer.writeNext(header);
 
         String[] line;
         while ((line = csvReader.readNext()) != null) {
 
-            String[] record = new String[]{"D"+index++, line[1], line[2], line[3], line[4]};
+            String siteUrl = "";
+            String siteName = "";
+            if (line[0].equals("S1")) {siteUrl = "blog.acthompson.net"; siteName = "Computer Science Teacher";}
+            if (line[0].equals("S2")) {siteUrl = "computinged.wordpress.com"; siteName = "Computing Ed Research";}
+            if (line[0].equals("S3")) {siteUrl = ""; siteName = "Freedom to Tinker";}
+            if (line[0].equals("S4")) {siteUrl = "scottaaronson.blog"; siteName = "Shtetl-Optimized";}
+            if (line[0].equals("S5")) {siteUrl = "www.section.io/blog/"; siteName = "Section Blog"; }
+            if (line[0].equals("S6")) {siteUrl = "www.hanselminutes.com"; siteName = "Hanselminutes Podcast";}
+
+            String[] record = new String[]{line[1], line[2], line[3], line[0], siteName, siteUrl, line[4], line[5]};
 
             writer.writeNext(record, true);
 

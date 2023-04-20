@@ -47,7 +47,7 @@ public class TopicModellingService {
         ArrayList<ArrayList<String>> result = new ArrayList<>();
         ArrayList<String> lines = new ArrayList<>();
 
-        GZIPInputStream gzip = new GZIPInputStream(new FileInputStream("Mallet-202108/output/topic-state.gz"));
+        GZIPInputStream gzip = new GZIPInputStream(new FileInputStream("Mallet-202108/output/topic-state-copy.gz"));
         BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
 
         // skip the first 3 lines
