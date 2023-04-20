@@ -51,28 +51,19 @@ public class Neo4jConnector implements AutoCloseable {
 
     public void createTopicAndWord() throws IOException {
 
-        ArrayList<ArrayList<String>> topicState = TopicModellingService.getTopicState();
+        Query query = new Query(
+                """
+                LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/word-topic-doc-db.csv' AS row
+                MERGE (t:Topic { topicId: row.topicId })
+                MERGE (w:Word { wordId: row.wordId, text: row.word })
+                MERGE (w)-[:belongs_to]->(t)
+                WITH w
+                MATCH (d:Document WHERE d.docId = row.docId)
+                MERGE (w)-[:found_in]->(d);
+                """);
+        runCypher(query);
 
-        for (ArrayList<String> line : topicState) {
-
-            Query query = new Query(
-                    """
-                    MERGE (t:Topic { topicId: $topicId })
-                    MERGE (w:Word { wordId: $wordId, text: $text })
-                    MERGE (w)-[:belongs_to]->(t)
-                    WITH w
-                    MATCH (d:Document WHERE d.docId = $docId)
-                    MERGE (w)-[:found_in]->(d);
-                    """,
-                    Map.of("topicId", line.get(5), "wordId", line.get(3), "text", line.get(4), "docId", line.get(1)));
-
-            runCypher(query);
-
-            System.out.println("Creating nodes for Topic " + line.get(5) + " and Word " + line.get(3) + "...");
-
-        }
-
-        System.out.println("Creating Topic and Word nodes completed");
+//        System.out.println("Creating Topic and Word nodes completed");
 
     }
 
