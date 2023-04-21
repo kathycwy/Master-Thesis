@@ -12,8 +12,9 @@ import java.util.zip.GZIPInputStream;
 public class TopicModellingService {
 
     public static void main(String[] args) throws Exception {
-        prepareTxt();
+//        prepareTxt();
 //        runMallet();
+        getCompositionArray();
     }
 
     static void prepareTxt() throws IOException {
@@ -73,6 +74,35 @@ public class TopicModellingService {
         return result;
     }
 
+    static public ArrayList<ArrayList<String>> getCompositionTxt() throws IOException {
+
+        ArrayList<ArrayList<String>> result = new ArrayList<>();
+        ArrayList<String> lines = new ArrayList<>();
+
+        BufferedReader br = new BufferedReader(new FileReader("Mallet-202108/output/composition.txt"));
+
+        CSVParser parser = new CSVParserBuilder()
+                .withSeparator(',')
+                .withIgnoreQuotations(false)
+                .build();
+
+        CSVReader csvReader = new CSVReaderBuilder(br)
+                .withSkipLines(1)
+                .withCSVParser(parser)
+                .build();
+
+        for (String line; (line = br.readLine()) != null; ) {
+            lines.add(line);
+        }
+
+        for (String str : lines) {
+            ArrayList<String> data = new ArrayList<>(Arrays.asList(str.split(" ")));
+            result.add(data);
+        }
+
+        return result;
+    }
+
     static public List<String[]> getDocument() {
 
         try {
@@ -100,8 +130,33 @@ public class TopicModellingService {
         return null;
     }
 
+    static public double[] getCompositionArray() throws IOException {
 
-        static public void runMallet() throws IOException, InterruptedException {
+        ArrayList<ArrayList<String>> topicState = getTopicState();
+        ArrayList<ArrayList<String>> compositionTxt = getCompositionTxt();
+
+        double[] compositions = new double[topicState.size()];
+
+        int wordId;
+        int docRow;
+        int topicColumn;
+
+        for (ArrayList<String> line : topicState) {
+
+            wordId = Integer.parseInt(line.get(3).substring(1));
+            docRow = Integer.parseInt(line.get(0));
+            topicColumn = Integer.parseInt(line.get(5).substring(1));
+            
+            compositions[wordId] += Double.parseDouble(compositionTxt.get(docRow).get(topicColumn+2));
+
+        }
+
+        return compositions;
+
+    }
+
+
+    static public void runMallet() throws IOException, InterruptedException {
 
 //        String[] command = new String[2];
 //        // transform individual txt files into a single MALLET format file

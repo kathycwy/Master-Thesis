@@ -93,10 +93,9 @@ public class Neo4jConnector implements AutoCloseable {
 
     public void createTopicAndWord() throws Exception {
 
-        for (int i = 3; i < 15; i++) {
+        for (int i = 0; i < 8; i++) {
 
             System.out.print("Start sending Cypher " + i + "...  ");
-
             String url = "https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/word-topic-doc-db-" + i + ".csv";
 
             Query query = new Query(
@@ -119,41 +118,20 @@ public class Neo4jConnector implements AutoCloseable {
 
     public void createWebsiteAndDocument() {
 
-        try {
+        System.out.print("Start sending Cypher...  ");
 
-            BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-300.csv"));
+        Query query = new Query(
+            """
+            LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/raw-200.csv' AS line
+            MERGE (s:Website { siteId: line.SiteId, siteName: line.SiteName, siteUrl: line.SiteUrl })
+            CREATE (d:Document { docId: line.DocId, publishDate: date(line.PublishDate), visitDate: date(line.VisitDate), url: line.Url })
+            CREATE (s)-[:contains]->(d);
+            """
+        );
+        runCypher(query);
 
-            CSVParser parser = new CSVParserBuilder()
-                    .withSeparator(',')
-                    .withIgnoreQuotations(false)
-                    .build();
+        System.out.println("Completed");
 
-            CSVReader csvReader = new CSVReaderBuilder(br)
-                    .withSkipLines(1)
-                    .withCSVParser(parser)
-                    .build();
-
-            String[] line;
-            while ((line = csvReader.readNext()) != null) {
-                if (line != null) {
-                    Query query = new Query(
-                        """
-                        MERGE (s:Website { siteId: $siteId, siteName: $siteName, siteUrl: $siteUrl })
-                        CREATE (d:Document { docId: $docId, publishDate: date($publishDate), visitDate: date($visitDate), url: $url })
-                        CREATE (s)-[:contains]->(d);
-                        """,
-                        Map.of("siteId", line[3], "siteName", line[4], "siteUrl", line[5], "docId", line[0], "publishDate", line[1], "visitDate", line[2], "url", line[6] )
-                    );
-                    runCypher(query);
-                    System.out.println("Creating nodes for Website " + line[3] + " and Document " + line[0] + "...");
-                }
-            }
-
-            System.out.println("Creating Website and Document nodes completed");
-
-        } catch (IOException e) {
-            System.out.println("Error - Input source not found.");
-        }
     }
 
     public void runCypher(final Query query) {
@@ -171,9 +149,9 @@ public class Neo4jConnector implements AutoCloseable {
 
     public static void main(String... args) throws IOException {
         // Aura queries use an encrypted connection using the "neo4j+s" protocol
-        String uri = "neo4j+s://b6b5a73b.databases.neo4j.io:7687";
+        String uri = "neo4j+s://7ffde07c.databases.neo4j.io:7687";
         String user = "neo4j";
-        String password = "1uAh6saxoe19nf1Qpi5Lw9fWdTZVMHNt89QPx-2zNXk";
+        String password = "password";
 
         try (Neo4jConnector app = new Neo4jConnector(uri, user, password, Config.defaultConfig())) {
 

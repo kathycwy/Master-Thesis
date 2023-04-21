@@ -10,9 +10,9 @@ public class Tools {
 //        reorderRaw();
 //        reorderClean();
 //        extract200();
-//        TopicModellingService.prepareTxt();
+        TopicModellingService.prepareTxt();
 //        TopicModellingService.getTopicState()
-        Neo4jConnector.prepareDbDataSplit();
+//        Neo4jConnector.prepareDbDataSplit();
 //        Neo4jConnector.prepareDbDataAll();
 //        TopicModellingService.getDocument();
 //        NlpService.getTokensList("src/main/output/testfiles/raw-200-clean.csv");
@@ -48,8 +48,8 @@ public class Tools {
 
     static void reorderRaw() throws IOException {
 
-        BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-250.csv"));
-        File f = new File("src/main/output/raw-250-ok.csv");
+        BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-200.csv"));
+        File f = new File("src/main/output/raw-200-ok.csv");
 
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(',')
