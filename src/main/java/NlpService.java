@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class NlpService {
 
-    private static String filepath = "src/main/output/raw-complete.csv";
+    private static String filepath = "src/main/output/raw-250.csv";
 
     public static void main(String[] args) throws IOException {
 
@@ -18,14 +18,14 @@ public class NlpService {
 
         int count = rawText.size();
 
-            File f = new File("src/main/output/raw-complete-clean-new.csv");
+            File f = new File("src/main/output/raw-250-clean.csv");
             FileWriter file = new FileWriter(f);
             CSVWriter writer = new CSVWriter(file);
             String[] header = { "DocId", "Tokens" };
             writer.writeNext(header);
 
         Set<String> tokens = null;
-        int index = 1;
+        int index = 0;
         for (String text : rawText) {
 
             tokens = NlpTextProcessor.removePosAndStopWords(text);

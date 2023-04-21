@@ -18,7 +18,7 @@ public class TopicModellingService {
 
     static void prepareTxt() throws IOException {
 
-        BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-complete-clean.csv"));
+        BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-250-clean.csv"));
 
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(',')

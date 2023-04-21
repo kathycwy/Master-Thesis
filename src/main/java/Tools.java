@@ -48,8 +48,8 @@ public class Tools {
 
     static void reorderRaw() throws IOException {
 
-        BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-complete-copy.csv"));
-        File f = new File("src/main/output/raw-complete.csv");
+        BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-250.csv"));
+        File f = new File("src/main/output/raw-250-ok.csv");
 
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(',')
@@ -68,19 +68,21 @@ public class Tools {
         String[] header = { "DocId", "PublishDate", "VisitDate", "SiteId", "SiteName", "SiteUrl", "Url", "Content" };
         writer.writeNext(header);
 
+        int docId = 0;
         String[] line;
         while ((line = csvReader.readNext()) != null) {
 
+            String siteId = "";
             String siteUrl = "";
             String siteName = "";
-            if (line[0].equals("S1")) {siteUrl = "blog.acthompson.net"; siteName = "Computer Science Teacher";}
-            if (line[0].equals("S2")) {siteUrl = "computinged.wordpress.com"; siteName = "Computing Ed Research";}
-            if (line[0].equals("S3")) {siteUrl = ""; siteName = "Freedom to Tinker";}
-            if (line[0].equals("S4")) {siteUrl = "scottaaronson.blog"; siteName = "Shtetl-Optimized";}
-            if (line[0].equals("S5")) {siteUrl = "www.section.io/blog/"; siteName = "Section Blog"; }
-            if (line[0].equals("S6")) {siteUrl = "www.hanselminutes.com"; siteName = "Hanselminutes Podcast";}
+            if (line[3].contains("blog.acthompson.net")) {siteId = "S1"; siteUrl = "blog.acthompson.net"; siteName = "Computer Science Teacher";}
+            if (line[3].contains("computinged.wordpress.com")) {siteId = "S2"; siteUrl = "computinged.wordpress.com"; siteName = "Computing Ed Research";}
+            if (line[3].contains("freedom-to-tinker.com")) {siteId = "S3"; siteUrl = "freedom-to-tinker.com"; siteName = "Freedom to Tinker";}
+            if (line[3].contains("scottaaronson.blog")) {siteId = "S4"; siteUrl = "scottaaronson.blog"; siteName = "Shtetl-Optimized";}
+            if (line[3].contains("www.section.io/blog/")) {siteId = "S5"; siteUrl = "www.section.io/blog/"; siteName = "Section Blog"; }
+            if (line[3].contains("app.podscribe.ai")) {siteId = "S6"; siteUrl = "www.hanselminutes.com"; siteName = "Hanselminutes Podcast";}
 
-            String[] record = new String[]{line[1], line[2], line[3], line[0], siteName, siteUrl, line[4], line[5]};
+            String[] record = new String[]{"D"+docId++, line[1], line[2], siteId, siteName, siteUrl, line[3], line[4]};
 
             writer.writeNext(record, true);
 

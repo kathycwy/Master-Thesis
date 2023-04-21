@@ -93,19 +93,27 @@ public class Neo4jConnector implements AutoCloseable {
 
     public void createTopicAndWord() throws Exception {
 
-        Query query = new Query(
-                """
-                   LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/word-topic-doc-db.csv' AS line
-                   MERGE (t:Topic { topicId: line.topicId })
-                   MERGE (w:Word { wordId: line.wordId, text: line.word })
-                   MERGE (w)-[:belongs_to]->(t)
-                   WITH w, line
-                   MATCH (d:Document WHERE d.docId = line.docId)
-                   MERGE (w)-[:found_in]->(d);
-                """);
-        runCypher(query);
+        for (int i = 3; i < 15; i++) {
 
-//        System.out.println("Creating Topic and Word nodes completed");
+            System.out.print("Start sending Cypher " + i + "...  ");
+
+            String url = "https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/word-topic-doc-db-" + i + ".csv";
+
+            Query query = new Query(
+                """
+                           LOAD CSV WITH HEADERS FROM $url AS line
+                           MERGE (t:Topic { topicId: line.topicId })
+                           MERGE (w:Word { wordId: line.wordId, text: line.word })
+                           MERGE (w)-[:belongs_to]->(t)
+                           WITH w, line
+                           MATCH (d:Document WHERE d.docId = line.docId)
+                           MERGE (w)-[:found_in]->(d);
+                        """,
+                    Map.of("url", url));
+            runCypher(query);
+
+            System.out.println("Completed");
+        }
 
     }
 
@@ -113,7 +121,7 @@ public class Neo4jConnector implements AutoCloseable {
 
         try {
 
-            BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-complete.csv"));
+            BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-300.csv"));
 
             CSVParser parser = new CSVParserBuilder()
                     .withSeparator(',')
@@ -165,23 +173,13 @@ public class Neo4jConnector implements AutoCloseable {
         // Aura queries use an encrypted connection using the "neo4j+s" protocol
         String uri = "neo4j+s://b6b5a73b.databases.neo4j.io:7687";
         String user = "neo4j";
-        String password = "password";
-
-        ArrayList<ArrayList<String>> topicStates = TopicModellingService.getTopicState();
-//        ArrayList<ArrayList<String>> tokensList = NlpService.getTokensList("src/main/output/testfiles/raw-200-clean.csv");
+        String password = "1uAh6saxoe19nf1Qpi5Lw9fWdTZVMHNt89QPx-2zNXk";
 
         try (Neo4jConnector app = new Neo4jConnector(uri, user, password, Config.defaultConfig())) {
 
-//            app.createWebsiteAndDocument();
-            app.createTopicAndWord();
-//            int id = 1;
-//            for (ArrayList<String> tokenLine : tokensList) {
-//                for (String token : tokenLine) {
-//                    app.createTopic("T" + id, token);
-//                    System.out.println("Creating nodes for Topic " + id++ + "...");
-//                }
-//            }
-//            System.out.println("Total " + id + " Topic nodes are created");
+            app.createWebsiteAndDocument();
+//            app.createTopicAndWord();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
