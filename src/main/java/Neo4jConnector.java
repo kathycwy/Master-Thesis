@@ -155,8 +155,8 @@ public class Neo4jConnector implements AutoCloseable {
 
         try (Neo4jConnector app = new Neo4jConnector(uri, user, password, Config.defaultConfig())) {
 
-            app.createWebsiteAndDocument();
-//            app.createTopicAndWord();
+//            app.createWebsiteAndDocument();
+            app.createTopicAndWord();
 
         } catch (Exception e) {
             e.printStackTrace();
