@@ -1,9 +1,13 @@
 import com.opencsv.*;
 import org.neo4j.driver.*;
+import org.neo4j.driver.Record;
 import org.neo4j.driver.exceptions.Neo4jException;
+import org.neo4j.driver.types.Node;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -11,7 +15,7 @@ import java.util.logging.Logger;
 
 public class Neo4jConnector implements AutoCloseable {
     private static final Logger LOGGER = Logger.getLogger(Neo4jConnector.class.getName());
-    private final Driver driver;
+    private static Driver driver;
 
     public Neo4jConnector(String uri, String user, String password, Config config) {
         // The driver is a long living object and should be opened during the start of your application
@@ -89,11 +93,58 @@ public class Neo4jConnector implements AutoCloseable {
     }
 
 
+    static public ArrayList<String[]> getNumOfDocWordAppears() {
+
+        ArrayList<String[]> resultList = new ArrayList<>();
+        String[] line = new String[2];
+
+        Query query = new Query(
+                """
+                          MATCH (w:Word)-[:found_in]->(d:Document)
+                          WHERE d.publishDate >= date({year: date().year - 5})
+                          WITH w.wordId AS wordId, count(d) AS numDocs
+                          RETURN wordId, numDocs;
+                        """);
+
+        try {
+
+            Session session = driver.session();
+            Transaction tx = session.beginTransaction();
+
+            // Write transactions allow the driver to handle retries and transient errors
+            Result cypherResult = tx.run(query);
+
+            while (cypherResult.hasNext()) {
+                Record record = cypherResult.next();
+                String wordId = record.get("wordId").asString();
+                int numDocs = record.get("numDocs").asInt();
+                line[0] = wordId;
+                line[1] = String.valueOf(numDocs);
+                resultList.add(line);
+            }
+
+            tx.commit();
+            session.close();
+
+            System.out.println(Arrays.toString(resultList.toArray()));
+
+            return resultList;
+
+
+        } catch (Neo4jException ex) {
+            // capture any errors along with the query and data for traceability
+            LOGGER.log(Level.SEVERE, query + " raised an exception", ex);
+            throw ex;
+        }
+    }
+
 
 
     public void createTopicAndWord() throws Exception {
 
-        for (int i = 0; i < 8; i++) {
+        System.out.println("Start Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
+
+        for (int i = 0; i < 6; i++) {
 
             System.out.print("Start sending Cypher " + i + "...  ");
             String url = "https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/word-topic-doc-db-" + i + ".csv";
@@ -114,9 +165,13 @@ public class Neo4jConnector implements AutoCloseable {
             System.out.println("Completed");
         }
 
+        System.out.println("End Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
+
     }
 
     public void createWebsiteAndDocument() {
+
+        System.out.println("Start Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
 
         System.out.print("Start sending Cypher...  ");
 
@@ -132,18 +187,26 @@ public class Neo4jConnector implements AutoCloseable {
 
         System.out.println("Completed");
 
+        System.out.println("End Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
+
     }
 
-    public void runCypher(final Query query) {
+    public Result runCypher(final Query query) {
+
+        Result result;
 
         try (Session session = driver.session()) {
+
             // Write transactions allow the driver to handle retries and transient errors
-            var record = session.executeWrite(tx -> tx.run(query));
-            // You should capture any errors along with the query and data for traceability
+            result = session.executeWrite(tx -> tx.run(query));
+
         } catch (Neo4jException ex) {
+            // capture any errors along with the query and data for traceability
             LOGGER.log(Level.SEVERE, query + " raised an exception", ex);
             throw ex;
         }
+
+        return result;
     }
 
 
@@ -156,7 +219,8 @@ public class Neo4jConnector implements AutoCloseable {
         try (Neo4jConnector app = new Neo4jConnector(uri, user, password, Config.defaultConfig())) {
 
 //            app.createWebsiteAndDocument();
-            app.createTopicAndWord();
+//            app.createTopicAndWord();
+            app.getNumOfDocWordAppears();
 
         } catch (Exception e) {
             e.printStackTrace();

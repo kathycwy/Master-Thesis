@@ -6,6 +6,7 @@ import com.opencsv.CSVReaderBuilder;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -48,7 +49,7 @@ public class TopicModellingService {
         ArrayList<ArrayList<String>> result = new ArrayList<>();
         ArrayList<String> lines = new ArrayList<>();
 
-        GZIPInputStream gzip = new GZIPInputStream(new FileInputStream("Mallet-202108/output/topic-state.gz"));
+        GZIPInputStream gzip = new GZIPInputStream(new FileInputStream("Mallet-202108/output/calComposition/topic-state-all.gz"));
         BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
 
         // skip the first 3 lines
@@ -79,7 +80,7 @@ public class TopicModellingService {
         ArrayList<ArrayList<String>> result = new ArrayList<>();
         ArrayList<String> lines = new ArrayList<>();
 
-        BufferedReader br = new BufferedReader(new FileReader("Mallet-202108/output/composition.txt"));
+        BufferedReader br = new BufferedReader(new FileReader("Mallet-202108/output/calComposition/composition-all.txt"));
 
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(',')
@@ -96,8 +97,41 @@ public class TopicModellingService {
         }
 
         for (String str : lines) {
-            ArrayList<String> data = new ArrayList<>(Arrays.asList(str.split(" ")));
+            ArrayList<String> data = new ArrayList<>(Arrays.asList(str.split("\t")));
             result.add(data);
+        }
+
+        return result;
+    }
+
+    static public ArrayList<ArrayList<String>> getRaw200() throws IOException {
+
+        ArrayList<ArrayList<String>> result = new ArrayList<>();
+
+        BufferedReader br = new BufferedReader(new FileReader("src/main/output/raw-200.csv"));
+
+        CSVParser parser = new CSVParserBuilder()
+                .withSeparator(',')
+                .withIgnoreQuotations(false)
+                .build();
+
+        CSVReader csvReader = new CSVReaderBuilder(br)
+                .withSkipLines(1)
+                .withCSVParser(parser)
+                .build();
+
+        String[] line;
+        while ((line = csvReader.readNext()) != null) {
+            ArrayList<String> lines = new ArrayList<>();
+            lines.add(line[0]);
+            lines.add(line[1]);
+//            lines.add(line[2]);
+//            lines.add(line[3]);
+//            lines.add(line[4]);
+//            lines.add(line[5]);
+//            lines.add(line[6]);
+//            lines.add(line[7]);
+            result.add(lines);
         }
 
         return result;
@@ -134,22 +168,59 @@ public class TopicModellingService {
 
         ArrayList<ArrayList<String>> topicState = getTopicState();
         ArrayList<ArrayList<String>> compositionTxt = getCompositionTxt();
+        ArrayList<ArrayList<String>> raw200 = getRaw200();
 
-        double[] compositions = new double[topicState.size()];
+//        double[] compositions = new double[topicState.size()];
+        // total number of word = 19127
+        double[] compositions = new double[19127];
 
         int wordId;
         int docRow;
         int topicColumn;
 
-        for (ArrayList<String> line : topicState) {
+//        String docId = topicState.get(0).get(1);
 
-            wordId = Integer.parseInt(line.get(3).substring(1));
-            docRow = Integer.parseInt(line.get(0));
-            topicColumn = Integer.parseInt(line.get(5).substring(1));
-            
-            compositions[wordId] += Double.parseDouble(compositionTxt.get(docRow).get(topicColumn+2));
+        String lastDocId = "xxx";
+        boolean within5Years = false;
+
+        for (ArrayList<String> line : topicState) {
+//
+            String docId = line.get(1);
+//
+//            // if docId of this line is not as same as last line in topicState
+//            if (!docId.equals(lastDocId)) {
+//
+//                lastDocId = docId;
+
+                for (ArrayList<String> rawLine : raw200) {
+
+                    if (rawLine.get(0).equals(docId)) {
+                        // check if PublishDate within 5 years
+                        within5Years = rawLine.get(1).startsWith("2022") || rawLine.get(1).startsWith("2021") || rawLine.get(1).startsWith("2020") || rawLine.get(1).startsWith("2019") || rawLine.get(1).startsWith("2018");
+
+                        // break when the required docId is found
+                        break;
+                    }
+
+                }
+//            }
+
+            if (within5Years) {
+                wordId = Integer.parseInt(line.get(3).substring(1));
+                docRow = Integer.parseInt(line.get(0));
+                topicColumn = Integer.parseInt(line.get(5).substring(1));
+
+                ArrayList<String> compositionLine = compositionTxt.get(docRow);
+                String value = compositionLine.get(topicColumn + 2);
+                double val = Double.parseDouble(value);
+                compositions[wordId] += val;
+            }
 
         }
+
+//        for (int i = 0; i < compositions.length; i++) {
+//            System.out.println("composition[" + i + "]: " + compositions[i]);
+//        }
 
         return compositions;
 
