@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class NlpService {
 
-    private static String filepath = "src/main/output/raw-150.csv";
+    private static String filepath = "src/main/output/report/raw-report.csv";
 
     public static void main(String[] args) throws IOException {
 
@@ -18,7 +18,7 @@ public class NlpService {
 
         int count = rawText.size();
 
-            File f = new File("src/main/output/raw-150-clean.csv");
+            File f = new File("src/main/output/report/raw-report-clean.csv");
             FileWriter file = new FileWriter(f);
             CSVWriter writer = new CSVWriter(file);
             String[] header = { "DocId", "Tokens" };

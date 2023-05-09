@@ -180,7 +180,6 @@ public class TopicModellingService {
 
 //        String docId = topicState.get(0).get(1);
 
-        String lastDocId = "xxx";
         boolean within5Years = false;
 
         for (ArrayList<String> line : topicState) {

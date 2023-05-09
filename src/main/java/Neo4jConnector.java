@@ -3,6 +3,8 @@ import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.exceptions.Neo4jException;
 import org.neo4j.driver.types.Node;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -12,10 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 public class Neo4jConnector implements AutoCloseable {
     private static final Logger LOGGER = Logger.getLogger(Neo4jConnector.class.getName());
-    private static Driver driver;
+    private final Driver driver;
 
     public Neo4jConnector(String uri, String user, String password, Config config) {
         // The driver is a long living object and should be opened during the start of your application
@@ -92,11 +95,83 @@ public class Neo4jConnector implements AutoCloseable {
 
     }
 
+    public void getWordIdList() {
 
-    static public ArrayList<String[]> getNumOfDocWordAppears() {
+        Query query = new Query(
+                """
+                          MATCH (n:Word)-[:belongs_to]->(t:Topic)
+                          WITH n.wordId AS wordId, n.text AS text, t.topicId AS topicId
+                          RETURN wordId, topicId, text
+                          ORDER BY wordId ASC;
+                        """);
 
-        ArrayList<String[]> resultList = new ArrayList<>();
-        String[] line = new String[2];
+        try (Session session = driver.session()) {
+
+            String[] wordArray = new String[19127];
+            Arrays.fill(wordArray, "");
+//            String[] topicArray = new String[19127];
+//            Arrays.fill(topicArray, "");
+
+            // Write transactions allow the driver to handle retries and transient errors
+            Stream<Map<String, Object>> stream = session.executeRead(tx -> {
+                Result result = tx.run(query);
+
+                while (result.hasNext()) {
+                    Record record = result.next();
+                    int wordId = Integer.parseInt(record.get("wordId").asString().substring(1));
+                    String topicId = record.get("topicId").asString();
+                    String text = record.get("text").asString();
+                    wordArray[wordId] = text;
+//                    topicArray[wordId] = topicId;
+//                    line[0] = wordId;
+//                    line[1] = String.valueOf(numDocs);
+//                    resultList.add(line);
+                }
+
+                FileWriter writer = null;
+                try {
+                    writer = new FileWriter("src/main/output/calWeakSignals/wordArray.txt");
+                    int wordArrayLen = wordArray.length;
+                    for (int i = 0; i < wordArrayLen; i++) {
+
+                        writer.write(wordArray[i] + " ");
+                    }
+
+                    writer.close();
+
+//                    writer = new FileWriter("src/main/output/calWeakSignals/topicArray.txt");
+//                    int topicLen = topicArray.length;
+//                    for (int i = 0; i < topicLen; i++) {
+//
+//                        writer.write(topicArray[i] + " ");
+//                    }
+//
+//                    writer.close();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println(Arrays.toString(wordArray));
+//                System.out.println(Arrays.toString(topicArray));
+
+                return result.list(r -> r.asMap()).stream();});
+
+//
+
+            session.close();
+
+
+
+        } catch (Neo4jException ex) {
+            // capture any errors along with the query and data for traceability
+            LOGGER.log(Level.SEVERE, query + " raised an exception", ex);
+            throw ex;
+        }
+
+    }
+
+    public int[] getNumOfDocWordAppears() {
 
         Query query = new Query(
                 """
@@ -106,29 +181,66 @@ public class Neo4jConnector implements AutoCloseable {
                           RETURN wordId, numDocs;
                         """);
 
-        try {
+//        try (var session = driver.session(SessionConfig.forDatabase("neo4j"))) {
+//            var record = session.executeRead(tx -> tx.run(query));
+//            System.out.printf("wordId: ", record.get("wordId").asString());
+//            // You should capture any errors along with the query and data for traceability
+//        } catch (Neo4jException ex) {
+//            LOGGER.log(Level.SEVERE, query + " raised an exception", ex);
+//            throw ex;
+//        }
 
-            Session session = driver.session();
-            Transaction tx = session.beginTransaction();
+//        Result result;
+
+        try (Session session = driver.session()) {
+
+            int[] numDocsArray = new int[19127];
+            Arrays.fill(numDocsArray, 0);
 
             // Write transactions allow the driver to handle retries and transient errors
-            Result cypherResult = tx.run(query);
+            Stream<Map<String, Object>> stream = session.executeRead(tx -> {
+                Result result = tx.run(query);
 
-            while (cypherResult.hasNext()) {
-                Record record = cypherResult.next();
-                String wordId = record.get("wordId").asString();
-                int numDocs = record.get("numDocs").asInt();
-                line[0] = wordId;
-                line[1] = String.valueOf(numDocs);
-                resultList.add(line);
-            }
+                ArrayList<String[]> resultList = new ArrayList<>();
+                String[] line = new String[2];
 
-            tx.commit();
+
+
+                while (result.hasNext()) {
+                    Record record = result.next();
+                    int wordId = Integer.parseInt(record.get("wordId").asString().substring(1));
+                    int numDocs = record.get("numDocs").asInt();
+                    numDocsArray[wordId] = numDocs;
+//                    line[0] = wordId;
+//                    line[1] = String.valueOf(numDocs);
+//                    resultList.add(line);
+                }
+
+                FileWriter writer = null;
+                try {
+                    writer = new FileWriter("src/main/output/calWeakSignals/numDocsArray.txt");
+                    int len = numDocsArray.length;
+                    for (int i = 0; i < len; i++) {
+
+                        writer.write(numDocsArray[i] + " ");
+                    }
+
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println(Arrays.toString(numDocsArray));
+
+                return result.list(r -> r.asMap()).stream();});
+
+//
+
             session.close();
 
-            System.out.println(Arrays.toString(resultList.toArray()));
 
-            return resultList;
+
+            return numDocsArray;
 
 
         } catch (Neo4jException ex) {
@@ -136,7 +248,13 @@ public class Neo4jConnector implements AutoCloseable {
             LOGGER.log(Level.SEVERE, query + " raised an exception", ex);
             throw ex;
         }
+
     }
+
+//    public static int[] getNumDocsArray() {
+//
+//        return numDocsArray;
+//    }
 
 
 
@@ -220,7 +338,8 @@ public class Neo4jConnector implements AutoCloseable {
 
 //            app.createWebsiteAndDocument();
 //            app.createTopicAndWord();
-            app.getNumOfDocWordAppears();
+//            app.getNumOfDocWordAppears();
+            app.getWordIdList();
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,0 +1,40 @@
+0	doc448.txt	8.436931511338832E-5	4.1235651719803166E-5	1.3488835454324435E-5	...   1.9284521735693426E-5
+1	doc306.txt	1.5449245046807525E-4	7.550845793021688E-5	2.4700013749057252E-5	...   3.5312755769654924E-5
+2	doc460.txt	1.9384923129659029E-4	9.474415404646683E-5	3.099231492388931E-5	...   4.430864123244897E-5
+3	doc474.txt	0.098492763410722	    5.322201508151534E-5	1.7409764949522198E-5	...   2.4890139087191448E-5
+4	doc312.txt	1.232208735695198E-4	6.022441950955595E-5	1.9700362458597375E-5	...   2.8164927159228004E-5
+5	doc886.txt	1.8361693512462115E-4	8.974310122679971E-5	2.9356391256640023E-5	...	  4.1969817719786866E-5
+6	doc138.txt	2.6011263805663244E-4	1.2713051109170909E-4	4.158640578770552E-5	...   5.945464669933877E-5
+7	doc1086.txt	3.949011969156069E-5	1.9300865720979775E-5	6.313619185780384E-6	...   9.026363086076414E-6
+8	doc1092.txt	3.455815543070973E-5	1.6890359480865776E-5	5.525104376909184E-6	...   7.8990507230423E-6
+9	doc892.txt	1.1399144584363043E-4	5.57135204135234E-5	    1.8224775845564104E-5	...   2.6055331990075314E-5
+10	doc662.txt	1.6495843360924835E-4	8.062372566866816E-5	2.6373298927078274E-5	...   3.7704993742668E-5
+
+
+#doc source pos typeindex type topic
+#alpha : 0.024350156397071707 0.01190118193045577 0.003893065298512115 ... 0.005565780872770736
+#beta : 0.013256504204693199
+0 doc448.txt 0  0  tamper   54
+0 doc448.txt 1  1  prepare  84
+0 doc448.txt 2  2  year     84
+0 doc448.txt 3  3  vary     7
+0 doc448.txt 4  4  nation   20
+0 doc448.txt 5  5  credible 57
+0 doc448.txt 6  6  maintain 7
+0 doc448.txt 7  7  shift    54
+0 doc448.txt 8  8  county   57
+0 doc448.txt 9  9  bring    84
+0 doc448.txt 10 10 accuracy 57
+
+0	0.02435	 court lawsuit law constitutional ruling copyright sue illegal attorney file legally
+1	0.0119	 kiss goodbye flawless diagnose frustrated replicate mobile crash rely oftentimes
+2	0.00389	 genre step divorced stylish trickle basketball empathetically fighter pharmaceutical
+3	0.00387	 destroyer governmental declaration inhabitant introspect utopian powerless mildly
+4	0.10507	 opportunity organization founder growth innovation pressure city advocate
+5	0.13892	 power scientist sound crucial explain theory regard consequence destroy invent
+6	0.04892	 moral defend media intellectual worldview sign reply join supporter liberal woman
+7	1.47301	 system set datum user base require process specific build case level order support
+8	0.0054	 tinfoil remarkably credible seafood mammal preview tribe serial visit possibility
+9	0.07823	 hardware device screen phone control plug video card smart driver chip buy mobile
+10	0.00885	 cryptocurrency transaction blockchain bitcoin deposit decentralize slight spoiler
+
