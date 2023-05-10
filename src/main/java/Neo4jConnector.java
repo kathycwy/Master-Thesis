@@ -109,8 +109,8 @@ public class Neo4jConnector implements AutoCloseable {
 
             String[] wordArray = new String[19127];
             Arrays.fill(wordArray, "");
-//            String[] topicArray = new String[19127];
-//            Arrays.fill(topicArray, "");
+            String[] topicArray = new String[19127];
+            Arrays.fill(topicArray, "");
 
             // Write transactions allow the driver to handle retries and transient errors
             Stream<Map<String, Object>> stream = session.executeRead(tx -> {
@@ -122,10 +122,7 @@ public class Neo4jConnector implements AutoCloseable {
                     String topicId = record.get("topicId").asString();
                     String text = record.get("text").asString();
                     wordArray[wordId] = text;
-//                    topicArray[wordId] = topicId;
-//                    line[0] = wordId;
-//                    line[1] = String.valueOf(numDocs);
-//                    resultList.add(line);
+                    topicArray[wordId] = (topicArray[wordId].isEmpty() ? topicId : topicArray[wordId]);
                 }
 
                 FileWriter writer = null;
@@ -139,21 +136,21 @@ public class Neo4jConnector implements AutoCloseable {
 
                     writer.close();
 
-//                    writer = new FileWriter("src/main/output/calWeakSignals/topicArray.txt");
-//                    int topicLen = topicArray.length;
-//                    for (int i = 0; i < topicLen; i++) {
-//
-//                        writer.write(topicArray[i] + " ");
-//                    }
-//
-//                    writer.close();
+                    writer = new FileWriter("src/main/output/calWeakSignals/topicArray.txt");
+                    int topicLen = topicArray.length;
+                    for (int i = 0; i < topicLen; i++) {
+
+                        writer.write(topicArray[i] + " ");
+                    }
+
+                    writer.close();
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
                 System.out.println(Arrays.toString(wordArray));
-//                System.out.println(Arrays.toString(topicArray));
+                System.out.println(Arrays.toString(topicArray));
 
                 return result.list(r -> r.asMap()).stream();});
 
@@ -173,13 +170,18 @@ public class Neo4jConnector implements AutoCloseable {
 
     public int[] getNumOfDocWordAppears() {
 
+        int year = 2018;
+//        int endYear = year + 1;
+        int endYear = 2023;
+
         Query query = new Query(
                 """
                           MATCH (w:Word)-[:found_in]->(d:Document)
-                          WHERE d.publishDate >= date({year: date().year - 5})
+                          WHERE d.publishDate >= date({year: $year}) AND d.publishDate < date({year: $endYear})
                           WITH w.wordId AS wordId, count(d) AS numDocs
                           RETURN wordId, numDocs;
-                        """);
+                        """,
+                Map.of("year", year, "endYear", endYear));
 
 //        try (var session = driver.session(SessionConfig.forDatabase("neo4j"))) {
 //            var record = session.executeRead(tx -> tx.run(query));
@@ -218,6 +220,7 @@ public class Neo4jConnector implements AutoCloseable {
 
                 FileWriter writer = null;
                 try {
+//                    writer = new FileWriter("src/main/output/calWeakSignals/numDocsArray" + year + ".txt");
                     writer = new FileWriter("src/main/output/calWeakSignals/numDocsArray.txt");
                     int len = numDocsArray.length;
                     for (int i = 0; i < len; i++) {
@@ -304,6 +307,31 @@ public class Neo4jConnector implements AutoCloseable {
         runCypher(query);
 
         System.out.println("Completed");
+
+        System.out.println("End Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
+
+    }
+
+    public void createScore() throws Exception {
+
+        System.out.println("Start Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
+
+        for (int i = 0; i < 6; i++) {
+
+            System.out.print("Start sending Cypher " + i + "...  ");
+            String url = "https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/word-topic-doc-db-" + i + ".csv";
+
+            Query query = new Query(
+                    """
+                               LOAD CSV WITH HEADERS FROM $url AS line
+                               MATCH (w:Word {wordId: line.wordId})
+                               SET w.score = line.score;
+                            """,
+                    Map.of("url", url));
+            runCypher(query);
+
+            System.out.println("Completed");
+        }
 
         System.out.println("End Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
 

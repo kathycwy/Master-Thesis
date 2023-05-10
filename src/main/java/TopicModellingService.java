@@ -15,7 +15,7 @@ public class TopicModellingService {
     public static void main(String[] args) throws Exception {
 //        prepareTxt();
 //        runMallet();
-        getCompositionArray();
+        getCompositionArray(new String[]{"2018" });
     }
 
     static void prepareTxt() throws IOException {
@@ -164,7 +164,7 @@ public class TopicModellingService {
         return null;
     }
 
-    static public double[] getCompositionArray() throws IOException {
+    static public double[] getCompositionArray(String[] years) throws IOException {
 
         ArrayList<ArrayList<String>> topicState = getTopicState();
         ArrayList<ArrayList<String>> compositionTxt = getCompositionTxt();
@@ -180,7 +180,7 @@ public class TopicModellingService {
 
 //        String docId = topicState.get(0).get(1);
 
-        boolean within5Years = false;
+        boolean withinYears = false;
 
         for (ArrayList<String> line : topicState) {
 //
@@ -195,7 +195,9 @@ public class TopicModellingService {
 
                     if (rawLine.get(0).equals(docId)) {
                         // check if PublishDate within 5 years
-                        within5Years = rawLine.get(1).startsWith("2022") || rawLine.get(1).startsWith("2021") || rawLine.get(1).startsWith("2020") || rawLine.get(1).startsWith("2019") || rawLine.get(1).startsWith("2018");
+                        String publishYear = rawLine.get(1).substring(0,4);
+                        withinYears = Arrays.asList(years).contains(publishYear);
+//                        within5Years = rawLine.get(1).startsWith("2022") || rawLine.get(1).startsWith("2021") || rawLine.get(1).startsWith("2020") || rawLine.get(1).startsWith("2019") || rawLine.get(1).startsWith("2018");
 
                         // break when the required docId is found
                         break;
@@ -204,7 +206,7 @@ public class TopicModellingService {
                 }
 //            }
 
-            if (within5Years) {
+            if (withinYears) {
                 wordId = Integer.parseInt(line.get(3).substring(1));
                 docRow = Integer.parseInt(line.get(0));
                 topicColumn = Integer.parseInt(line.get(5).substring(1));
