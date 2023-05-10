@@ -66,8 +66,6 @@ public class Neo4jConnector implements AutoCloseable {
             name++;
             System.out.println("created word-topic-doc-db-" + name + ".csv");
         }
-
-
     }
 
     public static void prepareDbDataAll() throws IOException {
@@ -316,22 +314,19 @@ public class Neo4jConnector implements AutoCloseable {
 
         System.out.println("Start Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
 
-        for (int i = 0; i < 6; i++) {
+        System.out.print("Start sending Cypher...  ");
+        String url = "https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/calWeakSignals/scores.csv";
 
-            System.out.print("Start sending Cypher " + i + "...  ");
-            String url = "https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/word-topic-doc-db-" + i + ".csv";
+        Query query = new Query(
+                """
+                           LOAD CSV WITH HEADERS FROM $url AS line
+                           MATCH (w:Word {wordId: line.wordId})
+                           SET w.score = line.score;
+                        """,
+                Map.of("url", url));
+        runCypher(query);
 
-            Query query = new Query(
-                    """
-                               LOAD CSV WITH HEADERS FROM $url AS line
-                               MATCH (w:Word {wordId: line.wordId})
-                               SET w.score = line.score;
-                            """,
-                    Map.of("url", url));
-            runCypher(query);
-
-            System.out.println("Completed");
-        }
+        System.out.println("Completed");
 
         System.out.println("End Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
 
@@ -367,7 +362,8 @@ public class Neo4jConnector implements AutoCloseable {
 //            app.createWebsiteAndDocument();
 //            app.createTopicAndWord();
 //            app.getNumOfDocWordAppears();
-            app.getWordIdList();
+//            app.getWordIdList();
+            app.createScore();
 
         } catch (Exception e) {
             e.printStackTrace();
