@@ -18,8 +18,7 @@ public class WeakSignalCalculator {
 //        double[] dov = calculateDoV(5, 1);
 //        double[] dod = calculateDoD(5, 1);
 //        calculateDoT();
-//        createWeakSignalValues();
-        createWeakSignalScore();
+        createWeakSignalValues();
 
 //        System.out.println(Arrays.toString(dov));
 
@@ -44,7 +43,7 @@ public class WeakSignalCalculator {
     // Method to find the normalized values of the data set
     static double[] normalize(int new_min, int new_max, double arr[]) {
         double[] v = arr;
-        System.out.println("The Data Set after Normalization: ");
+//        System.out.println("The Data Set after Normalization: ");
         for (int i = 0; i < arr.length; i++) {
             v[i] = ((arr[i] - minValue(arr)) / (maxValue(arr) - minValue(arr))) * (new_max - new_min) + new_min;
         }
@@ -56,9 +55,17 @@ public class WeakSignalCalculator {
         for (int i = 0; i < arr.length; i++) {
             v[i] = (double) arr[i];
         }
-        System.out.println("The Data Set after Normalization: ");
+//        System.out.println("The Data Set after Normalization: ");
         for (int i = 0; i < arr.length; i++) {
             v[i] = ((v[i] - minValue(v)) / (maxValue(v) - minValue(v))) * (new_max - new_min) + new_min;
+        }
+        return v;
+    }
+
+    static double[] add(double arr1[], double[] arr2) {
+        double[] v = new double[arr1.length];
+        for (int i = 0; i < arr1.length; i++) {
+            v[i] = arr1[i] + arr2[i];
         }
         return v;
     }
@@ -78,12 +85,12 @@ public class WeakSignalCalculator {
 
         double[] dov = new double[19127];
         for (int i = 0; i < arr.length; i++) {
-            dov[i] = arr[i] * (1 - tw * (n - j));
+            dov[i] = arr[i] / 820.0 * (1 - tw * (n - j));
         }
 
         dov = normalize(0, 1, dov);
 
-        System.out.println(Arrays.toString(dov));
+//        System.out.println(Arrays.toString(dov));
 
         return dov;
 
@@ -98,7 +105,7 @@ public class WeakSignalCalculator {
 
         dod = normalize(0, 1, dod);
 
-        System.out.println(Arrays.toString(dod));
+//        System.out.println(Arrays.toString(dod));
 
         return dod;
     }
@@ -123,7 +130,7 @@ public class WeakSignalCalculator {
             delta[i] = (delta12[i] + delta23[i] + delta34[i] + delta45[i]) / n;
         }
 
-        System.out.println(Arrays.toString(delta));
+//        System.out.println(Arrays.toString(delta));
 
         return delta;
     }
@@ -164,44 +171,46 @@ public class WeakSignalCalculator {
             }
         }
 
-        System.out.println(Arrays.toString(dot));
+//        System.out.println(Arrays.toString(dot));
 
 
     }
 
-    public static void createWeakSignalScore() throws IOException {
+    public static double[] createWeakSignalScore(double[] dov, int[] numDocs, double[] dod) throws IOException {
 
-        double[] compositionArray5Years = TopicModellingService.getCompositionArray(new String[]{"2018", "2019", "2020", "2021", "2022"});
-        double[] dov = calculateDoV(5, 1, compositionArray5Years);
-
-        int[] numDocs = new int[19127];
-        int j = 0;
-        Scanner scanner2 = new Scanner(new File("src/main/output/calWeakSignals/numDocsArray.txt"));
-        while(scanner2.hasNextInt()) { numDocs[j++] = scanner2.nextInt(); }
-        double[] dod = calculateDoD(5, 1, numDocs);
+//        double[] compositionArray5Years = TopicModellingService.getCompositionArray(new String[]{"2018", "2019", "2020", "2021", "2022"});
+//        double[] dov = calculateDoV(5, 1, compositionArray5Years);
+//
+//        int[] numDocs = new int[19127];
+//        int j = 0;
+//        Scanner scanner2 = new Scanner(new File("src/main/output/calWeakSignals/numDocsArray.txt"));
+//        while(scanner2.hasNextInt()) { numDocs[j++] = scanner2.nextInt(); }
+//        double[] dod = calculateDoD(5, 1, numDocs);
 
         double[] normalizedNumDocs = normalize(0, 1, numDocs);
 
-        System.out.println(Arrays.toString(normalizedNumDocs));
+//        System.out.println(Arrays.toString(normalizedNumDocs));
 
         double scores[] = new double[19127];
         for (int i = 0; i < dov.length; i++) {
-            scores[i] = (dov[i] * dod[i] * (1 - normalizedNumDocs[i]));
+            scores[i] = (dov[i] + dod[i] + (1 - normalizedNumDocs[i]));
         }
 
         scores = normalize(0, 100, scores);
 
-        System.out.println(Arrays.toString(scores));
+//        System.out.println(Arrays.toString(scores));
 
-        File f = new File("src/main/output/calWeakSignals/scores.csv");
-        CSVWriter writer = new CSVWriter(new FileWriter(f, true));
-        String[] header = {"wordId", "score"};
-        writer.writeNext(header);
-        for (int i = 0; i < scores.length; i++) {
-            String[] record = new String[]{"W" + i, String.valueOf(String.format("%,.2f", scores[i]))};
-            writer.writeNext(record, false);
-        }
-        writer.close();
+        return scores;
+
+//        File f = new File("src/main/output/calWeakSignals/scores.csv");
+//        CSVWriter writer = new CSVWriter(new FileWriter(f, true));
+//        String[] header = {"wordId", "score"};
+//        writer.writeNext(header);
+//        for (int i = 0; i < scores.length; i++) {
+//            String[] record = new String[]{"W" + i, String.valueOf(String.format("%,.2f", scores[i]))};
+//            writer.writeNext(record, false);
+//        }
+//        writer.close();
 
     }
 
@@ -214,16 +223,19 @@ public class WeakSignalCalculator {
         double[] compositionArray2021 = TopicModellingService.getCompositionArray(new String[]{"2021"});
         double[] compositionArray2022 = TopicModellingService.getCompositionArray(new String[]{"2022"});
         double[] compositionArray5Years = TopicModellingService.getCompositionArray(new String[]{"2018", "2019", "2020", "2021", "2022"});
+        System.out.println("composition array done");
 
         String[] wordArray = new String[19127];
         Scanner scanner1 = new Scanner(new File("src/main/output/calWeakSignals/wordArray.txt"));
         int i = 0;
         while(scanner1.hasNext()) { wordArray[i++] = scanner1.next(); }
+        System.out.println("word array done");
 
         String[] topicArray = new String[19127];
         scanner1 = new Scanner(new File("src/main/output/calWeakSignals/topicArray.txt"));
         i = 0;
         while(scanner1.hasNext()) { topicArray[i++] = scanner1.next(); }
+        System.out.println("topic array done");
 
         int[] numDocsArray5Years = new int[19127];
         int[] numDocsArray2018 = new int[19127];
@@ -249,33 +261,41 @@ public class WeakSignalCalculator {
         j = 0;
         scanner2 = new Scanner(new File("src/main/output/calWeakSignals/numDocsArray2022.txt"));
         while(scanner2.hasNextInt()) { numDocsArray2022[j++] = scanner2.nextInt(); }
+        System.out.println("numDocs array done");
 
         double[] dov2018 = calculateDoV(5, 1, compositionArray2018);
-        double[] dov2019 = calculateDoV(5, 1, compositionArray2019);
-        double[] dov2020 = calculateDoV(5, 1, compositionArray2020);
-        double[] dov2021 = calculateDoV(5, 1, compositionArray2021);
-        double[] dov2022 = calculateDoV(5, 1, compositionArray2022);
-        double[] dov = calculateDoV(5, 1, compositionArray5Years);
+        double[] dov2019 = calculateDoV(5, 2, compositionArray2019);
+        double[] dov2020 = calculateDoV(5, 3, compositionArray2020);
+        double[] dov2021 = calculateDoV(5, 4, compositionArray2021);
+        double[] dov2022 = calculateDoV(5, 5, compositionArray2022);
+//        double[] dov = calculateDoV(5, 5, compositionArray5Years);
+        double[] dov = add(add(add(add(dov2018, dov2019), dov2020), dov2021), dov2022);
         double[] dovDelta = calculateDelta(dov2018, dov2019, dov2020, dov2021, dov2022);
+        System.out.println("dov array done");
 
         double[] dod2018 = calculateDoD(5, 1, numDocsArray2018);
-        double[] dod2019 = calculateDoD(5, 1, numDocsArray2019);
-        double[] dod2020 = calculateDoD(5, 1, numDocsArray2020);
-        double[] dod2021 = calculateDoD(5, 1, numDocsArray2021);
-        double[] dod2022 = calculateDoD(5, 1, numDocsArray2022);
-        double[] dod = calculateDoD(5, 1, numDocsArray5Years);
+        double[] dod2019 = calculateDoD(5, 2, numDocsArray2019);
+        double[] dod2020 = calculateDoD(5, 3, numDocsArray2020);
+        double[] dod2021 = calculateDoD(5, 4, numDocsArray2021);
+        double[] dod2022 = calculateDoD(5, 5, numDocsArray2022);
+//        double[] dod = calculateDoD(5, 1, numDocsArray5Years);
+        double[] dod = add(add(add(add(dod2018, dod2019), dod2020), dod2021), dod2022);
         double[] dodDelta = calculateDelta(dod2018, dod2019, dod2020, dod2021, dod2022);
+        System.out.println("dod array done");
 
-        ArrayList<ArrayList<String>> topicState = TopicModellingService.getTopicState();
+        double[] scores = createWeakSignalScore(dov, numDocsArray5Years, dod);
+        System.out.println("scores array done");
 
-        File f = new File("src/main/output/calWeakSignals/WeakSignalValues.csv");
+        // output
+        File f = new File("src/main/output/calWeakSignals/WeakSignalValues_2.csv");
         CSVWriter writer = new CSVWriter(new FileWriter(f, true));
-        String[] header = {"wordId", "word", "topicId", "dov", "dovDelta", "composition", "dod", "dodDelta", "numDocs"};
+        String[] header = {"wordId", "word", "topicId", "dov", "dovDelta", "composition", "dod", "dodDelta", "numDocs", "score"};
         writer.writeNext(header);
         for (int x = 0; x < 19127; x++) {
             String[] record = new String[]{"W" + x, wordArray[x], topicArray[x],
                     String.valueOf(dov[x]), String.valueOf(dovDelta[x]), String.valueOf(compositionArray5Years[x]),
-                    String.valueOf(dod[x]), String.valueOf(dodDelta[x]), String.valueOf(numDocsArray5Years[x])};
+                    String.valueOf(dod[x]), String.valueOf(dodDelta[x]), String.valueOf(numDocsArray5Years[x]),
+                    String.valueOf(String.format("%,.2f", scores[x]))};
             writer.writeNext(record, true);
         }
         writer.close();
