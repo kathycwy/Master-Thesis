@@ -273,7 +273,7 @@ public class WeakSignalCalculator {
         double[] dov2020 = calculateDoV(5, 3, 201.0, compositionArray2020);
         double[] dov2021 = calculateDoV(5, 4, 121.0, compositionArray2021);
         double[] dov2022 = calculateDoV(5, 5, 164.0, compositionArray2022);
-        double[] dov = calculateDoV(5, 1, 785.0, compositionArray5Years);
+        double[] dov = calculateDoV(5, 5, 785.0, compositionArray5Years);
 //        double[] dov = add(add(add(add(dov2018, dov2019), dov2020), dov2021), dov2022);
         double[] dovDelta = calculateDelta(dov2018, dov2019, dov2020, dov2021, dov2022);
         System.out.println("DONE");
@@ -284,7 +284,7 @@ public class WeakSignalCalculator {
         double[] dod2020 = calculateDoD(5, 3, 201.0, numDocsArray2020);
         double[] dod2021 = calculateDoD(5, 4, 121.0, numDocsArray2021);
         double[] dod2022 = calculateDoD(5, 5, 164.0, numDocsArray2022);
-        double[] dod = calculateDoD(5, 1, 785.0, numDocsArray5Years);
+        double[] dod = calculateDoD(5, 5, 785.0, numDocsArray5Years);
 //        double[] dod = add(add(add(add(dod2018, dod2019), dod2020), dod2021), dod2022);
         double[] dodDelta = calculateDelta(dod2018, dod2019, dod2020, dod2021, dod2022);
         System.out.println("DONE");
@@ -294,7 +294,7 @@ public class WeakSignalCalculator {
         System.out.println("DONE");
 
         // output
-        File f = new File("src/main/output/calWeakSignals/WeakSignalValues_5.csv");
+        File f = new File("src/main/output/calWeakSignals/WeakSignalValues_4.csv");
         CSVWriter writer = new CSVWriter(new FileWriter(f, true));
         String[] header = {"wordId", "word", "topicId", "dov", "dovDelta", "composition", "dod", "dodDelta", "numDocs", "score"};
         writer.writeNext(header);
@@ -303,7 +303,7 @@ public class WeakSignalCalculator {
                     String.valueOf(dov[x]), String.valueOf(dovDelta[x]), String.valueOf(compositionArray5Years[x]),
                     String.valueOf(dod[x]), String.valueOf(dodDelta[x]), String.valueOf(numDocsArray5Years[x]),
                     String.valueOf(String.format("%,.2f", scores[x]))};
-            writer.writeNext(record, true);
+            writer.writeNext(record, false);
         }
         writer.close();
 
