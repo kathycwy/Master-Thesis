@@ -81,11 +81,11 @@ public class WeakSignalCalculator {
 //        return array;
 //    }
 
-    public static double[] calculateDoV(int n, int j, double[] arr) throws IOException {
+    public static double[] calculateDoV(int n, int j, double nnj, double[] arr) throws IOException {
 
         double[] dov = new double[19127];
         for (int i = 0; i < arr.length; i++) {
-            dov[i] = arr[i] / 820.0 * (1 - tw * (n - j));
+            dov[i] = arr[i] / nnj * (1 - tw * (n - j));
         }
 
         dov = normalize(0, 1, dov);
@@ -96,11 +96,11 @@ public class WeakSignalCalculator {
 
     }
 
-    public static double[] calculateDoD(int n, int j, int[] arr) {
+    public static double[] calculateDoD(int n, int j, double nnj, int[] arr) {
 
         double[] dod = new double[19127];
         for (int i = 0; i < arr.length; i++) {
-            dod[i] = arr[i] / 820.0 * (1 - tw * (n - j));
+            dod[i] = arr[i] / nnj * (1 - tw * (n - j));
         }
 
         dod = normalize(0, 1, dod);
@@ -217,26 +217,30 @@ public class WeakSignalCalculator {
 
     public static void createWeakSignalValues() throws IOException {
 
+        System.out.print("START composition array...   ");
         double[] compositionArray2018 = TopicModellingService.getCompositionArray(new String[]{"2018"});
         double[] compositionArray2019 = TopicModellingService.getCompositionArray(new String[]{"2019"});
         double[] compositionArray2020 = TopicModellingService.getCompositionArray(new String[]{"2020"});
         double[] compositionArray2021 = TopicModellingService.getCompositionArray(new String[]{"2021"});
         double[] compositionArray2022 = TopicModellingService.getCompositionArray(new String[]{"2022"});
         double[] compositionArray5Years = TopicModellingService.getCompositionArray(new String[]{"2018", "2019", "2020", "2021", "2022"});
-        System.out.println("composition array done");
+        System.out.println("DONE");
 
+        System.out.print("START word array...   ");
         String[] wordArray = new String[19127];
         Scanner scanner1 = new Scanner(new File("src/main/output/calWeakSignals/wordArray.txt"));
         int i = 0;
         while(scanner1.hasNext()) { wordArray[i++] = scanner1.next(); }
-        System.out.println("word array done");
+        System.out.println("DONE");
 
+        System.out.print("START topic array...   ");
         String[] topicArray = new String[19127];
         scanner1 = new Scanner(new File("src/main/output/calWeakSignals/topicArray.txt"));
         i = 0;
         while(scanner1.hasNext()) { topicArray[i++] = scanner1.next(); }
-        System.out.println("topic array done");
+        System.out.println("DONE");
 
+        System.out.print("START numDocs array...   ");
         int[] numDocsArray5Years = new int[19127];
         int[] numDocsArray2018 = new int[19127];
         int[] numDocsArray2019 = new int[19127];
@@ -261,33 +265,36 @@ public class WeakSignalCalculator {
         j = 0;
         scanner2 = new Scanner(new File("src/main/output/calWeakSignals/numDocsArray2022.txt"));
         while(scanner2.hasNextInt()) { numDocsArray2022[j++] = scanner2.nextInt(); }
-        System.out.println("numDocs array done");
+        System.out.println("DONE");
 
-        double[] dov2018 = calculateDoV(5, 1, compositionArray2018);
-        double[] dov2019 = calculateDoV(5, 2, compositionArray2019);
-        double[] dov2020 = calculateDoV(5, 3, compositionArray2020);
-        double[] dov2021 = calculateDoV(5, 4, compositionArray2021);
-        double[] dov2022 = calculateDoV(5, 5, compositionArray2022);
-//        double[] dov = calculateDoV(5, 5, compositionArray5Years);
-        double[] dov = add(add(add(add(dov2018, dov2019), dov2020), dov2021), dov2022);
+        System.out.print("START dov array...   ");
+        double[] dov2018 = calculateDoV(5, 1, 138.0, compositionArray2018);
+        double[] dov2019 = calculateDoV(5, 2, 161.0, compositionArray2019);
+        double[] dov2020 = calculateDoV(5, 3, 201.0, compositionArray2020);
+        double[] dov2021 = calculateDoV(5, 4, 121.0, compositionArray2021);
+        double[] dov2022 = calculateDoV(5, 5, 164.0, compositionArray2022);
+        double[] dov = calculateDoV(5, 1, 785.0, compositionArray5Years);
+//        double[] dov = add(add(add(add(dov2018, dov2019), dov2020), dov2021), dov2022);
         double[] dovDelta = calculateDelta(dov2018, dov2019, dov2020, dov2021, dov2022);
-        System.out.println("dov array done");
+        System.out.println("DONE");
 
-        double[] dod2018 = calculateDoD(5, 1, numDocsArray2018);
-        double[] dod2019 = calculateDoD(5, 2, numDocsArray2019);
-        double[] dod2020 = calculateDoD(5, 3, numDocsArray2020);
-        double[] dod2021 = calculateDoD(5, 4, numDocsArray2021);
-        double[] dod2022 = calculateDoD(5, 5, numDocsArray2022);
-//        double[] dod = calculateDoD(5, 1, numDocsArray5Years);
-        double[] dod = add(add(add(add(dod2018, dod2019), dod2020), dod2021), dod2022);
+        System.out.print("START dod array...   ");
+        double[] dod2018 = calculateDoD(5, 1, 138.0, numDocsArray2018);
+        double[] dod2019 = calculateDoD(5, 2, 161.0, numDocsArray2019);
+        double[] dod2020 = calculateDoD(5, 3, 201.0, numDocsArray2020);
+        double[] dod2021 = calculateDoD(5, 4, 121.0, numDocsArray2021);
+        double[] dod2022 = calculateDoD(5, 5, 164.0, numDocsArray2022);
+        double[] dod = calculateDoD(5, 1, 785.0, numDocsArray5Years);
+//        double[] dod = add(add(add(add(dod2018, dod2019), dod2020), dod2021), dod2022);
         double[] dodDelta = calculateDelta(dod2018, dod2019, dod2020, dod2021, dod2022);
-        System.out.println("dod array done");
+        System.out.println("DONE");
 
+        System.out.print("START scores array...   ");
         double[] scores = createWeakSignalScore(dov, numDocsArray5Years, dod);
-        System.out.println("scores array done");
+        System.out.println("DONE");
 
         // output
-        File f = new File("src/main/output/calWeakSignals/WeakSignalValues_2.csv");
+        File f = new File("src/main/output/calWeakSignals/WeakSignalValues_5.csv");
         CSVWriter writer = new CSVWriter(new FileWriter(f, true));
         String[] header = {"wordId", "word", "topicId", "dov", "dovDelta", "composition", "dod", "dodDelta", "numDocs", "score"};
         writer.writeNext(header);
