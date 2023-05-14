@@ -1,14 +1,17 @@
 import com.opencsv.*;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Tools {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
 //        tableOutput();
-        tableOutputFromCSV();
+        tableOutputKemKim();
 //        reorderRaw();
 //        reorderClean();
 //        extract200();
@@ -197,7 +200,7 @@ public class Tools {
 
     }
 
-    static void tableOutputFromCSV() throws IOException {
+    static void tableOutputTop50Scores() throws IOException {
 
         BufferedReader br = new BufferedReader(new FileReader("src/main/output/calWeakSignals/top_50_scores.csv"));
 
@@ -228,6 +231,72 @@ public class Tools {
                             word[i+25] + " & " + score[i+25] +" \\\\");
 
         }
+
+    }
+
+    static void tableOutputKemKim() throws IOException {
+
+        BufferedReader br1 = new BufferedReader(new FileReader("src/main/output/calWeakSignals/plot_kem.csv"));
+        BufferedReader br2 = new BufferedReader(new FileReader("src/main/output/calWeakSignals/plot_kim_2.csv"));
+
+        CSVParser parser = new CSVParserBuilder()
+                .withSeparator(',')
+                .withIgnoreQuotations(false)
+                .build();
+
+        CSVReader csvReader1 = new CSVReaderBuilder(br1)
+                .withSkipLines(1)
+                .withCSVParser(parser)
+                .build();
+
+        CSVReader csvReader2 = new CSVReaderBuilder(br2)
+                .withSkipLines(1)
+                .withCSVParser(parser)
+                .build();
+
+        String[] line;
+        String[] kem = new String[4005];
+        String[] kim = new String[860];
+        int index = 0;
+        while ((line = csvReader1.readNext()) != null) {
+            if (line != null) {
+                kem[index++] = line[2];
+            }
+        }
+        System.out.println("KEM: " + --index + Arrays.toString(kem));
+
+        index = 0;
+        while ((line = csvReader2.readNext()) != null) {
+            if (line != null) {
+                kim[index++] = line[2];
+            }
+        }
+        System.out.println("KIM: " + --index + Arrays.toString(kim));
+
+        String[] identical = new String[5000];
+        index = 0;
+
+        Set<String> set = new HashSet<>();
+
+        for (String element : kem) {
+            set.add(element);
+        }
+
+        for (String element : kim) {
+            if (set.contains(element)) {
+                identical[index++] = element;
+            }
+        }
+
+        System.out.println("identical: " + --index + Arrays.toString(identical));
+
+//        for (int i = 0; i < 25; i++) {
+//
+//            System.out.println(
+//                    kem[i] + " & " + kim[i] + " & " +
+//                            kem[i+25] + " & " + kim[i+25] +" \\\\");
+//
+//        }
 
     }
 
