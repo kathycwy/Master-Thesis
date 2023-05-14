@@ -7,7 +7,8 @@ public class Tools {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        tableOutput();
+//        tableOutput();
+        tableOutputFromCSV();
 //        reorderRaw();
 //        reorderClean();
 //        extract200();
@@ -192,6 +193,40 @@ public class Tools {
                     Integer.valueOf(i) + " & " + str[i-1] + " & " +
                     Integer.valueOf(i+34) + " & " + str[i+33] + " & " +
                     Integer.valueOf(i+68) + " & " + str[i+67] + "\\\\");
+        }
+
+    }
+
+    static void tableOutputFromCSV() throws IOException {
+
+        BufferedReader br = new BufferedReader(new FileReader("src/main/output/calWeakSignals/top_50_scores.csv"));
+
+        CSVParser parser = new CSVParserBuilder()
+                .withSeparator(',')
+                .withIgnoreQuotations(false)
+                .build();
+
+        CSVReader csvReader = new CSVReaderBuilder(br)
+                .withSkipLines(1)
+                .withCSVParser(parser)
+                .build();
+
+        String[] line;
+        String[] word = new String[50];
+        String[] score = new String[50];
+        int index = 0;
+        while ((line = csvReader.readNext()) != null) {
+            if (line != null) {
+                word[index] = line[1];
+                score[index++] = line[2];
+            }
+        }
+        for (int i = 0; i < 25; i++) {
+
+            System.out.println(
+                    word[i] + " & " + score[i] + " & " +
+                            word[i+25] + " & " + score[i+25] +" \\\\");
+
         }
 
     }
