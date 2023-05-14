@@ -128,23 +128,23 @@ public class WeakSignalCalculator {
 
         double[] delta = new double[19127];
 
-//        for (int i = 0; i < len; i++) {
-//            delta[i] = geometricMean(arr1[i], arr2[i], arr3[i], arr4[i], arr5[i]);
-//        }
-        double[] delta12 = new double[19127];
-        double[] delta23 = new double[19127];
-        double[] delta34 = new double[19127];
-        double[] delta45 = new double[19127];
-
         for (int i = 0; i < len; i++) {
-            int n = 4;
-            if (arr4[i] == 0) { delta45[i] = 0; n--; } else { delta45[i] = ((arr5[i] - arr4[i]) / arr4[i]) / 5; }
-            if (arr3[i] == 0) { delta34[i] = 0; n--; } else { delta34[i] = ((arr4[i] - arr3[i]) / arr3[i]) / 5; }
-            if (arr2[i] == 0) { delta23[i] = 0; n--; } else { delta23[i] = ((arr3[i] - arr2[i]) / arr2[i]) / 5; }
-            if (arr1[i] == 0) { delta12[i] = 0; n--; } else { delta12[i] = ((arr2[i] - arr1[i]) / arr1[i]) / 5; }
-
-            delta[i] = (delta12[i] + delta23[i] + delta34[i] + delta45[i]) / n;
+            delta[i] = geometricMean(arr1[i], arr2[i], arr3[i], arr4[i], arr5[i]);
         }
+//        double[] delta12 = new double[19127];
+//        double[] delta23 = new double[19127];
+//        double[] delta34 = new double[19127];
+//        double[] delta45 = new double[19127];
+//
+//        for (int i = 0; i < len; i++) {
+//            int n = 4;
+//            if (arr4[i] == 0) { delta45[i] = 0; n--; } else { delta45[i] = ((arr5[i] - arr4[i]) / arr4[i]) / 5; }
+//            if (arr3[i] == 0) { delta34[i] = 0; n--; } else { delta34[i] = ((arr4[i] - arr3[i]) / arr3[i]) / 5; }
+//            if (arr2[i] == 0) { delta23[i] = 0; n--; } else { delta23[i] = ((arr3[i] - arr2[i]) / arr2[i]) / 5; }
+//            if (arr1[i] == 0) { delta12[i] = 0; n--; } else { delta12[i] = ((arr2[i] - arr1[i]) / arr1[i]) / 5; }
+//
+//            delta[i] = (delta12[i] + delta23[i] + delta34[i] + delta45[i]) / n;
+//        }
 
 //        System.out.println(Arrays.toString(delta));
 
@@ -210,7 +210,7 @@ public class WeakSignalCalculator {
         double scores[] = new double[19127];
         for (int i = 0; i < dov.length; i++) {
 //            scores[i] = (dov[i] + dod[i] + (1 - normalizedNumDocs[i]));
-            scores[i] = (dov[i] * dod[i] * (1 - (numDocs[i] / 785.0)));
+            scores[i] = (dov[i] + dod[i] + (1 - (numDocs[i] / 785.0)));
         }
 
         scores = normalize(0, 100, scores);
@@ -307,11 +307,11 @@ public class WeakSignalCalculator {
         System.out.println("DONE");
 
         System.out.print("START scores array...   ");
-        double[] scores = createWeakSignalScore(dov, numDocsArray5Years, dod);
+        double[] scores = createWeakSignalScore(dovDelta, numDocsArray5Years, dodDelta);
         System.out.println("DONE");
 
         // output
-        File f = new File("src/main/output/calWeakSignals/WeakSignalValues_10.csv");
+        File f = new File("src/main/output/calWeakSignals/WeakSignalValues_11.csv");
         CSVWriter writer = new CSVWriter(new FileWriter(f, true));
         String[] header = {"wordId", "word", "topicId", "dov", "dovDelta", "composition", "dod", "dodDelta", "numDocs", "score"};
         writer.writeNext(header);
