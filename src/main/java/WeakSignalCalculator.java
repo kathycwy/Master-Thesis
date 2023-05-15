@@ -211,7 +211,7 @@ public class WeakSignalCalculator {
         double maxComposition = maxValue(composition);
         for (int i = 0; i < dov.length; i++) {
 //            scores[i] = (dov[i] + dod[i] + (1 - normalizedNumDocs[i]));
-            scores[i] = (dov[i] + dod[i] + (1 - (numDocs[i] / 785.0)) + (1 - (composition[i] / maxComposition)));
+            scores[i] = (dov[i] + dod[i] + (1.0 - (numDocs[i] / 785.0)) + (1 - (composition[i] / maxComposition)));
         }
 
         scores = normalize(0, 100, scores);
