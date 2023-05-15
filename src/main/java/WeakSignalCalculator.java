@@ -214,7 +214,7 @@ public class WeakSignalCalculator {
             scores[i] = (dov[i] + dod[i] + (1.0 - (numDocs[i] / 785.0)) + (1 - (composition[i] / maxComposition)));
         }
 
-//        scores = normalize(0, 100, scores);
+        scores = normalize(0, 10, scores);
 
 //        System.out.println(Arrays.toString(scores));
 
@@ -312,7 +312,7 @@ public class WeakSignalCalculator {
         System.out.println("DONE");
 
         // output
-        File f = new File("src/main/output/calWeakSignals/WeakSignalValues_14.csv");
+        File f = new File("src/main/output/calWeakSignals/WeakSignalValues_15.csv");
         CSVWriter writer = new CSVWriter(new FileWriter(f, true));
         String[] header = {"wordId", "word", "topicId", "dov", "dovDelta", "composition", "dod", "dodDelta", "numDocs", "score"};
         writer.writeNext(header);
