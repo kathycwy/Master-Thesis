@@ -315,7 +315,29 @@ public class Neo4jConnector implements AutoCloseable {
         System.out.println("Start Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
 
         System.out.print("Start sending Cypher...  ");
-        String url = "https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/calWeakSignals/WeakSignalValues_14.csv";
+        String url = "https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/calWeakSignals/WeakSignalValues_13.csv";
+
+        Query query = new Query(
+                """
+                           LOAD CSV WITH HEADERS FROM $url AS line
+                           MATCH (w:Word {wordId: line.wordId})
+                           SET w.score = line.score;
+                        """,
+                Map.of("url", url));
+        runCypher(query);
+
+        System.out.println("Completed");
+
+        System.out.println("End Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
+
+    }
+
+    public void createTopicLabel() throws Exception {
+
+        System.out.println("Start Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
+
+        System.out.print("Start sending Cypher...  ");
+        String url = "https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/calWeakSignals/WeakSignalValues_13.csv";
 
         Query query = new Query(
                 """
