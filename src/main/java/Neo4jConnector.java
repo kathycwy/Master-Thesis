@@ -337,13 +337,13 @@ public class Neo4jConnector implements AutoCloseable {
         System.out.println("Start Time: " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new java.util.Date()));
 
         System.out.print("Start sending Cypher...  ");
-        String url = "https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/src/main/output/calWeakSignals/WeakSignalValues_13.csv";
+        String url = "https://raw.githubusercontent.com/kathycwy/Master-Thesis/master/Mallet-202108/output/keys_topic_label.csv";
 
         Query query = new Query(
                 """
-                           LOAD CSV WITH HEADERS FROM $url AS line
-                           MATCH (w:Word {wordId: line.wordId})
-                           SET w.score = line.score;
+                           LOAD CSV FROM $url AS line
+                           MATCH (t:Topic {topicId: line[0]})
+                           SET t.label = line[1];
                         """,
                 Map.of("url", url));
         runCypher(query);
@@ -385,7 +385,8 @@ public class Neo4jConnector implements AutoCloseable {
 //            app.createTopicAndWord();
 //            app.getNumOfDocWordAppears();
 //            app.getWordIdList();
-            app.createScore();
+//            app.createScore();
+            app.createTopicLabel();
 
         } catch (Exception e) {
             e.printStackTrace();

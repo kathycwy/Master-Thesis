@@ -151,47 +151,6 @@ public class WeakSignalCalculator {
         return delta;
     }
 
-    public static void calculateDoT() throws FileNotFoundException {
-
-
-        String[] wordArray = new String[19127];
-
-        Scanner scanner = new Scanner(new File("src/main/output/calWeakSignals/wordArray.txt"));
-        int i = 0;
-        while(scanner.hasNext())
-        {
-            wordArray[i++] = scanner.next();
-        }
-
-        double[] dot = new double[19127];
-        int j = 0;
-
-        for (String word : wordArray) {
-            String startYear = "2018";
-            String endYear = "2023";
-            String url = "https://scholar.google.com/scholar?" + "&as_ylo=" + startYear + "&as_yhi=" + endYear + "q=" + word;
-
-            try {
-                Document doc = Jsoup.connect(url).get();
-                Elements resultCss = doc.select("#gs_ab_md");
-
-                String resultCssText = resultCss.text();
-                String[] resultCssArray = resultCssText.split(" ");
-                double result = Double.parseDouble(resultCssArray[1].replace(".", ""));
-
-                dot[j++] = result;
-
-//                System.out.println("Number of search results for \"" + word + "\": " + result);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-//        System.out.println(Arrays.toString(dot));
-
-
-    }
-
     public static double[] createWeakSignalScore(double[] dov, double[] dod, double[] composition, int[] numDocs) throws IOException {
 
 //        double[] compositionArray5Years = TopicModellingService.getCompositionArray(new String[]{"2018", "2019", "2020", "2021", "2022"});
@@ -214,7 +173,7 @@ public class WeakSignalCalculator {
             scores[i] = (dov[i] + dod[i] + (1.0 - (numDocs[i] / 785.0)) + (1 - (composition[i] / maxComposition)));
         }
 
-        scores = normalize(0, 10, scores);
+//        scores = normalize(0, 10, scores);
 
 //        System.out.println(Arrays.toString(scores));
 
@@ -312,7 +271,7 @@ public class WeakSignalCalculator {
         System.out.println("DONE");
 
         // output
-        File f = new File("src/main/output/calWeakSignals/WeakSignalValues_15.csv");
+        File f = new File("src/main/output/calWeakSignals/WeakSignalValues_16.csv");
         CSVWriter writer = new CSVWriter(new FileWriter(f, true));
         String[] header = {"wordId", "word", "topicId", "dov", "dovDelta", "composition", "dod", "dodDelta", "numDocs", "score"};
         writer.writeNext(header);
@@ -320,7 +279,7 @@ public class WeakSignalCalculator {
             String[] record = new String[]{"W" + x, wordArray[x], topicArray[x],
                     String.valueOf(dov[x]), String.valueOf(dovDelta[x]), String.valueOf(compositionArray5Years[x]),
                     String.valueOf(dod[x]), String.valueOf(dodDelta[x]), String.valueOf(numDocsArray5Years[x]),
-                    String.valueOf(String.format("%,.2f", scores[x]))};
+                    String.valueOf(String.format("%,.6f", scores[x]))};
             writer.writeNext(record, false);
         }
         writer.close();
