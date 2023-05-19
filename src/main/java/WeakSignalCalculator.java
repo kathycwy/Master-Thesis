@@ -167,9 +167,12 @@ public class WeakSignalCalculator {
 //        System.out.println(Arrays.toString(normalizedNumDocs));
 
         double scores[] = new double[19127];
+        Arrays.fill(scores, 0);
+
         double maxComposition = maxValue(composition);
         for (int i = 0; i < dov.length; i++) {
 //            scores[i] = (dov[i] + dod[i] + (1 - normalizedNumDocs[i]));
+            if (numDocs[i] == 0) { continue; }
             scores[i] = (dov[i] + dod[i] + (1.0 - (numDocs[i] / 785.0)) + (1 - (composition[i] / maxComposition)));
         }
 
