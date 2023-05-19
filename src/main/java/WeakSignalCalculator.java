@@ -127,6 +127,7 @@ public class WeakSignalCalculator {
         int len = arr1.length;
 
         double[] delta = new double[19127];
+        Arrays.fill(delta, 0);
 
 //        for (int i = 0; i < len; i++) {
 //            delta[i] = geometricMean(arr1[i], arr2[i], arr3[i], arr4[i], arr5[i]);
@@ -143,6 +144,7 @@ public class WeakSignalCalculator {
             if (arr2[i] == 0) { delta23[i] = 0; n--; } else { delta23[i] = ((arr3[i] - arr2[i]) / arr2[i]) / 5; }
             if (arr1[i] == 0) { delta12[i] = 0; n--; } else { delta12[i] = ((arr2[i] - arr1[i]) / arr1[i]) / 5; }
 
+            if (n == 4) { continue; }
             delta[i] = (delta12[i] + delta23[i] + delta34[i] + delta45[i]) / n;
         }
 
